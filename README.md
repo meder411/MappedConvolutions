@@ -1,5 +1,5 @@
 # Mapped Convolutions
-Official PyTorch implementation of the Mapped Convolution
+## Official PyTorch implementation of the Mapped Convolution
 
 
-COMING SOON....
+Code coming in July 2019.
