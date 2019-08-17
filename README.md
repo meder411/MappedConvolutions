@@ -1,7 +1,7 @@
 # Mapped Convolutions
 **Official PyTorch implementation of the mapped convolution operation**
 
-Code coming in July 2019.
+Code coming in October 2019.
 
 In the meantime, feel free to [read our paper](https://arxiv.org/abs/1906.11096).
 
