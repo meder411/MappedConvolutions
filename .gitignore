@@ -1,0 +1,11 @@
+*clang*
+*bumpversion*
+sftp-config.json
+
+# Ignore all distutils files
+build/
+dist/
+*.egg-info/
+
+# Ignore pycache
+_pycache_

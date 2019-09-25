@@ -1,0 +1,8 @@
+torch==1.0.0
+numpy
+matplotlib
+scikit-image
+pytest
+openexr
+plyfile
+visdom
