@@ -46,7 +46,7 @@ def extension(name, package, source_basename):
 
 setup(
     name='Mapped Convolution',
-    version='0.0.0',
+    version='0.0.1',
     author='Marc Eder',
     description='A PyTorch module for mapped convolutions',
     ext_package='_mapped_convolution_ext',
