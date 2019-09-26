@@ -1,7 +1,7 @@
 #ifndef RESAMPLE_CUH_
 #define RESAMPLE_CUH_
 
-#include <ATen/ATen.h>
+#include <torch/extension.h>
 
 #include "cuda_helper.h"
 #include "nn/common/resample.h"
@@ -25,18 +25,18 @@ __global__ void ResampleToMap2DKernel(
                           interpolation, data_out_ptr);
 }
 
-void ResampleToMap2DLauncher(at::Tensor data_in,
-                             at::Tensor sample_map,  // IH, IW, 2
+void ResampleToMap2DLauncher(torch::Tensor data_in,
+                             torch::Tensor sample_map,  // IH, IW, 2
                              const int64_t channels, const int64_t in_height,
                              const int64_t in_width, const int64_t out_height,
                              const int64_t out_width,
                              const int64_t interpolation,
-                             at::Tensor data_out) {
+                             torch::Tensor data_out) {
   const int64_t num_kernels = channels * in_height * in_width;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
   AT_DISPATCH_FLOATING_TYPES(
-      data_in.type(), "ResampleToMap2DKernel", ([&] {
+      data_in.scalar_type(), "ResampleToMap2DKernel", ([&] {
         ResampleToMap2DKernel<scalar_t><<<blocks, CUDA_NUM_THREADS>>>(
             num_kernels, data_in.data<scalar_t>(), sample_map.data<scalar_t>(),
             channels, in_height, in_width, out_height, out_width,
@@ -61,14 +61,15 @@ __global__ void ResampleFromMap2DKernel(
 }
 
 void ResampleFromMap2DLauncher(
-    at::Tensor data_out, at::Tensor sample_map, const int64_t channels,
+    torch::Tensor data_out, torch::Tensor sample_map, const int64_t channels,
     const int64_t in_height, const int64_t in_width, const int64_t out_height,
-    const int64_t out_width, const int64_t interpolation, at::Tensor data_in) {
+    const int64_t out_width, const int64_t interpolation,
+    torch::Tensor data_in) {
   const int64_t num_kernels = channels * in_height * in_width;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
   AT_DISPATCH_FLOATING_TYPES(
-      data_in.type(), "ResampleFromMap2DKernel", ([&] {
+      data_in.scalar_type(), "ResampleFromMap2DKernel", ([&] {
         ResampleFromMap2DKernel<scalar_t><<<blocks, CUDA_NUM_THREADS>>>(
             num_kernels, data_out.data<scalar_t>(),
             sample_map.data<scalar_t>(), channels, in_height, in_width,
@@ -98,18 +99,18 @@ __global__ void ResampleToMap2DWeightedKernel(
 }
 
 void ResampleToMap2DWeightedLauncher(
-    at::Tensor data_in,
-    at::Tensor sample_map,      // IH, IW, P, 2
-    at::Tensor interp_weights,  // IH, IW, P
+    torch::Tensor data_in,
+    torch::Tensor sample_map,      // IH, IW, P, 2
+    torch::Tensor interp_weights,  // IH, IW, P
     const int64_t channels, const int64_t in_height, const int64_t in_width,
     const int64_t out_height, const int64_t out_width,
     const int64_t interpolation, const int64_t num_interp_pts,
-    at::Tensor data_out) {
+    torch::Tensor data_out) {
   const int64_t num_kernels = channels * in_height * in_width;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
   AT_DISPATCH_FLOATING_TYPES(
-      data_in.type(), "ResampleToMap2DWeightedKernel", ([&] {
+      data_in.scalar_type(), "ResampleToMap2DWeightedKernel", ([&] {
         ResampleToMap2DWeightedKernel<scalar_t><<<blocks, CUDA_NUM_THREADS>>>(
             num_kernels, data_in.data<scalar_t>(), sample_map.data<scalar_t>(),
             interp_weights.data<scalar_t>(), channels, in_height, in_width,
@@ -138,16 +139,16 @@ __global__ void ResampleFromMap2DWeightedKernel(
 }
 
 void ResampleFromMap2DWeightedLauncher(
-    at::Tensor data_out, at::Tensor sample_map, at::Tensor interp_weights,
-    const int64_t channels, const int64_t in_height, const int64_t in_width,
-    const int64_t out_height, const int64_t out_width,
-    const int64_t interpolation, const int64_t num_interp_pts,
-    at::Tensor data_in) {
+    torch::Tensor data_out, torch::Tensor sample_map,
+    torch::Tensor interp_weights, const int64_t channels,
+    const int64_t in_height, const int64_t in_width, const int64_t out_height,
+    const int64_t out_width, const int64_t interpolation,
+    const int64_t num_interp_pts, torch::Tensor data_in) {
   const int64_t num_kernels = channels * in_height * in_width;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
   AT_DISPATCH_FLOATING_TYPES(
-      data_in.type(), "ResampleFromMap2DWeightedKernel", ([&] {
+      data_in.scalar_type(), "ResampleFromMap2DWeightedKernel", ([&] {
         ResampleFromMap2DWeightedKernel<scalar_t>
             <<<blocks, CUDA_NUM_THREADS>>>(
                 num_kernels, data_out.data<scalar_t>(),
@@ -177,11 +178,11 @@ __global__ void ResampleToMap2DVotingKernel(
 }
 
 void ResampleToMap2DVotingLauncher(
-    at::Tensor data_in,
-    at::Tensor sample_map,  // IH, IW, P, 2
+    torch::Tensor data_in,
+    torch::Tensor sample_map,  // IH, IW, P, 2
     const int64_t channels, const int64_t in_height, const int64_t in_width,
     const int64_t out_height, const int64_t out_width,
-    const int64_t numCandidates, at::Tensor data_out) {
+    const int64_t numCandidates, torch::Tensor data_out) {
   const int64_t num_kernels = channels * in_height * in_width;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 

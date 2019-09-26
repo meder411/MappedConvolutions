@@ -11,30 +11,32 @@ namespace nn {
 
 #ifndef __NO_CUDA__  // CUDA compilation only
 namespace cuda {
-at::Tensor WeightedMappedAvgPoolForward(at::Tensor input,
-                                        at::Tensor sample_map,
-                                        at::Tensor interp_weights,
-                                        int kernel_size, int interpolation);
+torch::Tensor WeightedMappedAvgPoolForward(torch::Tensor input,
+                                           torch::Tensor sample_map,
+                                           torch::Tensor interp_weights,
+                                           int kernel_size, int interpolation);
 
-at::Tensor WeightedMappedAvgPoolBackward(at::Tensor input,
-                                         at::Tensor sample_map,
-                                         at::Tensor interp_weights,
-                                         int inputHeight, int inputWidth,
-                                         int kernel_size, int interpolation);
+torch::Tensor WeightedMappedAvgPoolBackward(torch::Tensor input,
+                                            torch::Tensor sample_map,
+                                            torch::Tensor interp_weights,
+                                            int inputHeight, int inputWidth,
+                                            int kernel_size,
+                                            int interpolation);
 }  // namespace cuda
 #endif
 
 namespace cpu {
-at::Tensor WeightedMappedAvgPoolForward(at::Tensor input,
-                                        at::Tensor sample_map,
-                                        at::Tensor interp_weights,
-                                        int kernel_size, int interpolation);
+torch::Tensor WeightedMappedAvgPoolForward(torch::Tensor input,
+                                           torch::Tensor sample_map,
+                                           torch::Tensor interp_weights,
+                                           int kernel_size, int interpolation);
 
-at::Tensor WeightedMappedAvgPoolBackward(at::Tensor input,
-                                         at::Tensor sample_map,
-                                         at::Tensor interp_weights,
-                                         int inputHeight, int inputWidth,
-                                         int kernel_size, int interpolation);
+torch::Tensor WeightedMappedAvgPoolBackward(torch::Tensor input,
+                                            torch::Tensor sample_map,
+                                            torch::Tensor interp_weights,
+                                            int inputHeight, int inputWidth,
+                                            int kernel_size,
+                                            int interpolation);
 }  // namespace cpu
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -43,10 +45,11 @@ at::Tensor WeightedMappedAvgPoolBackward(at::Tensor input,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-at::Tensor WeightedMappedAvgPoolForward(at::Tensor input,
-                                        at::Tensor sample_map,
-                                        at::Tensor interp_weights,
-                                        int kernel_size, int interpolation) {
+torch::Tensor WeightedMappedAvgPoolForward(torch::Tensor input,
+                                           torch::Tensor sample_map,
+                                           torch::Tensor interp_weights,
+                                           int kernel_size,
+                                           int interpolation) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(sample_map);
   CHECK_CONTIGUOUS(interp_weights);
@@ -69,11 +72,12 @@ at::Tensor WeightedMappedAvgPoolForward(at::Tensor input,
   }
 }
 
-at::Tensor WeightedMappedAvgPoolBackward(at::Tensor input,
-                                         at::Tensor sample_map,
-                                         at::Tensor interp_weights,
-                                         int inputHeight, int inputWidth,
-                                         int kernel_size, int interpolation) {
+torch::Tensor WeightedMappedAvgPoolBackward(torch::Tensor input,
+                                            torch::Tensor sample_map,
+                                            torch::Tensor interp_weights,
+                                            int inputHeight, int inputWidth,
+                                            int kernel_size,
+                                            int interpolation) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(sample_map);
   CHECK_CONTIGUOUS(interp_weights);

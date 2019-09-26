@@ -60,7 +60,7 @@ class Sphere {
 
   Sphere();
   Sphere(const Sphere &sphere);
-  Sphere(at::Tensor pts, at::Tensor faces);
+  Sphere(torch::Tensor pts, torch::Tensor faces);
   Sphere(const std::vector<float> &pts, const std::vector<int64_t> &faces);
 
   void addFace(std::shared_ptr<Face> f);
@@ -73,45 +73,47 @@ class Sphere {
   static const Sphere generateIcosphere(const size_t order);
 
   // Returns OH x OW x Kh*Kw
-  static const std::vector<at::Tensor> getPlanarConvolutionOperatorFromSamples(
-      at::Tensor samples, const size_t order, const bool keepdim = false,
-      const bool nearest = false);
+  static const std::vector<torch::Tensor>
+  getPlanarConvolutionOperatorFromSamples(torch::Tensor samples,
+                                          const size_t order,
+                                          const bool keepdim = false,
+                                          const bool nearest = false);
 
   // Returns V x 3
-  const at::Tensor getVertices() const;
+  const torch::Tensor getVertices() const;
 
   // Returns F x 3 x 3, F sets of 3 rows of points (each row is a point)
-  const at::Tensor getAllFaceVertexCoordinates() const;
+  const torch::Tensor getAllFaceVertexCoordinates() const;
 
   // Returns F x 3, F rows of 3 indices
-  const at::Tensor getAllFaceVertexIndices() const;
+  const torch::Tensor getAllFaceVertexIndices() const;
 
   // Returns F x 3
-  const at::Tensor getFaceBarycenters() const;
+  const torch::Tensor getFaceBarycenters() const;
 
   // Returns F x 3
-  const at::Tensor getAdjacentFaceIndicesToFaces() const;
+  const torch::Tensor getAdjacentFaceIndicesToFaces() const;
 
   // Returns <variable>
-  const at::Tensor getAdjacentFaceIndicesToVertices() const;
+  const torch::Tensor getAdjacentFaceIndicesToVertices() const;
 
   // Returns variable
-  const at::Tensor getAdjacentVertexIndicesToVertices() const;
+  const torch::Tensor getAdjacentVertexIndicesToVertices() const;
 
-  const at::Tensor getAllFaceConvolutionOperatorIndicesDeg1() const;
+  const torch::Tensor getAllFaceConvolutionOperatorIndicesDeg1() const;
 
-  const at::Tensor getAllFaceConvolutionOperatorIndicesDeg2(
+  const torch::Tensor getAllFaceConvolutionOperatorIndicesDeg2(
       const bool dilation) const;
 
   const Sphere loopSubdivision(const size_t iterations) const;
 
-  const at::Tensor getOriginalFaceIndices() const;
+  const torch::Tensor getOriginalFaceIndices() const;
 
-  void scaleVertices(at::Tensor scale);
+  void scaleVertices(torch::Tensor scale);
 
-  const at::Tensor getFaceNormals() const;
+  const torch::Tensor getFaceNormals() const;
 
-  const at::Tensor getVertexNormals() const;
+  const torch::Tensor getVertexNormals() const;
 
   const Sphere quadricEdgeCollapse(const size_t target_num_faces) const;
 };
@@ -128,7 +130,7 @@ const size_t Sphere::numFaces() const {
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   py::class_<mapped_conv::sphere::Sphere>(m, "Sphere")
-      .def(py::init<at::Tensor, at::Tensor>())
+      .def(py::init<torch::Tensor, torch::Tensor>())
       .def("num_vertices", &mapped_conv::sphere::Sphere::numVertices)
       .def("num_faces", &mapped_conv::sphere::Sphere::numFaces)
       .def("get_vertices", &mapped_conv::sphere::Sphere::getVertices)

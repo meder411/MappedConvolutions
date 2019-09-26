@@ -1,8 +1,8 @@
 #ifndef CUBE2RECT_CUH_
 #define CUBE2RECT_CUH_
 
-#include <ATen/ATen.h>
 #include <math.h>
+#include <torch/extension.h>
 
 #include "core/conversions.h"
 #include "core/interpolation.h"
@@ -65,15 +65,15 @@ __global__ void Cube2RectKernel(
 
 // Expects the cubemap input as [back, left, front, right, top, bottom] or
 // equivalently [-z, -x, +z, +x, +y, -y]
-void Cube2RectLauncher(at::Tensor cubemap, const int64_t cube_dim,
+void Cube2RectLauncher(torch::Tensor cubemap, const int64_t cube_dim,
                        const int64_t rect_height, const int64_t rect_width,
                        const int64_t channels, const int64_t interpolation,
-                       at::Tensor rect) {
+                       torch::Tensor rect) {
   const int64_t num_kernels = channels * rect_height * rect_width;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
   AT_DISPATCH_FLOATING_TYPES(
-      cubemap.type(), "Cube2RectLauncher", ([&] {
+      cubemap.scalar_type(), "Cube2RectLauncher", ([&] {
         Cube2RectKernel<scalar_t><<<blocks, CUDA_NUM_THREADS>>>(
             num_kernels, cubemap.data<scalar_t>(), cube_dim, rect_height,
             rect_width, channels, interpolation, rect.data<scalar_t>());

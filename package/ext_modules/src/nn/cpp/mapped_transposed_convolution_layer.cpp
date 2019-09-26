@@ -5,10 +5,12 @@ namespace mapped_conv {
 namespace nn {
 namespace cpu {
 
-at::Tensor MappedTransposedConvForward(at::Tensor input, at::Tensor sample_map,
-                                       at::Tensor weight, at::Tensor bias,
-                                       int outputHeight, int outputWidth,
-                                       int kernel_size, int interpolation) {
+torch::Tensor MappedTransposedConvForward(torch::Tensor input,
+                                          torch::Tensor sample_map,
+                                          torch::Tensor weight,
+                                          torch::Tensor bias, int outputHeight,
+                                          int outputWidth, int kernel_size,
+                                          int interpolation) {
   // Useful dimensions to have
   const int64_t nInputPlanes  = weight.size(0);
   const int64_t nOutputPlanes = weight.size(1);
@@ -16,22 +18,22 @@ at::Tensor MappedTransposedConvForward(at::Tensor input, at::Tensor sample_map,
   const int64_t batchSize     = input.size(0);
 
   // Initialize output and temporary columns
-  at::Tensor output = at::zeros(
+  torch::Tensor output = torch::zeros(
       {batchSize, nOutputPlanes, outputHeight, outputWidth}, input.options());
 
   // For each elt in batch, do:
   for (int b = 0; b < batchSize; b++) {
     // Use PyTorch for the initial matrix multiplication
-    at::Tensor columns = weight.view({weight.size(0), -1})
-                             .transpose(1, 0)
-                             .mm(input[b].view({nInputPlanes, -1}));
+    torch::Tensor columns = weight.view({weight.size(0), -1})
+                                .transpose(1, 0)
+                                .mm(input[b].view({nInputPlanes, -1}));
 
-    if (input.dtype() == at::kDouble) {
+    if (input.dtype() == torch::kDouble) {
       MappedCol2Im2D<double>(nOutputPlanes * columns.size(1), columns,
                              sample_map, outputHeight, outputWidth, inputWidth,
                              columns.size(1), kernel_size, interpolation,
                              output[b]);
-    } else if (input.dtype() == at::kFloat) {
+    } else if (input.dtype() == torch::kFloat) {
       MappedCol2Im2D<float>(nOutputPlanes * columns.size(1), columns,
                             sample_map, outputHeight, outputWidth, inputWidth,
                             columns.size(1), kernel_size, interpolation,
@@ -44,8 +46,8 @@ at::Tensor MappedTransposedConvForward(at::Tensor input, at::Tensor sample_map,
   return output;
 }
 
-at::Tensor MappedTransposedConvBackwardInput(
-    at::Tensor grad_output, at::Tensor sample_map, at::Tensor weight,
+torch::Tensor MappedTransposedConvBackwardInput(
+    torch::Tensor grad_output, torch::Tensor sample_map, torch::Tensor weight,
     int inputHeight, int inputWidth, int kernel_size, int interpolation) {
   // Useful dimensions to have
   const int64_t nInputPlanes  = weight.size(0);
@@ -55,21 +57,21 @@ at::Tensor MappedTransposedConvBackwardInput(
   const int64_t batchSize     = grad_output.size(0);
 
   // Initialize output and temporary columns
-  at::Tensor input_grad =
-      at::zeros({batchSize, nInputPlanes, inputHeight, inputWidth},
-                grad_output.options());
-  at::Tensor columns =
-      at::zeros({kernel_size * nOutputPlanes, inputHeight * inputWidth},
-                grad_output.options());
+  torch::Tensor input_grad =
+      torch::zeros({batchSize, nInputPlanes, inputHeight, inputWidth},
+                   grad_output.options());
+  torch::Tensor columns =
+      torch::zeros({kernel_size * nOutputPlanes, inputHeight * inputWidth},
+                   grad_output.options());
 
   // For each elt in batch, do:
   for (int b = 0; b < batchSize; b++) {
-    if (grad_output.dtype() == at::kDouble) {
+    if (grad_output.dtype() == torch::kDouble) {
       MappedIm2Col2D<double>(nOutputPlanes * columns.size(1), grad_output[b],
                              sample_map, outputHeight, outputWidth, inputWidth,
                              columns.size(1), kernel_size, interpolation,
                              columns);
-    } else if (grad_output.dtype() == at::kFloat) {
+    } else if (grad_output.dtype() == torch::kFloat) {
       MappedIm2Col2D<float>(nOutputPlanes * columns.size(1), grad_output[b],
                             sample_map, outputHeight, outputWidth, inputWidth,
                             columns.size(1), kernel_size, interpolation,
@@ -85,11 +87,11 @@ at::Tensor MappedTransposedConvBackwardInput(
   return input_grad;
 }
 
-at::Tensor MappedTransposedConvBackwardWeight(at::Tensor grad_output,
-                                              at::Tensor sample_map,
-                                              at::Tensor input,
-                                              int kernel_size,
-                                              int interpolation) {
+torch::Tensor MappedTransposedConvBackwardWeight(torch::Tensor grad_output,
+                                                 torch::Tensor sample_map,
+                                                 torch::Tensor input,
+                                                 int kernel_size,
+                                                 int interpolation) {
   // Useful dimensions to have
   const int64_t nOutputPlanes = grad_output.size(1);
   const int64_t nInputPlanes  = input.size(1);
@@ -100,20 +102,20 @@ at::Tensor MappedTransposedConvBackwardWeight(at::Tensor grad_output,
   const int64_t batchSize     = grad_output.size(0);
 
   // Initialize output and temporary columns
-  at::Tensor weight_grad = at::zeros(
+  torch::Tensor weight_grad = torch::zeros(
       {nInputPlanes, nOutputPlanes, kernel_size}, grad_output.options());
-  at::Tensor columns =
-      at::zeros({kernel_size * nOutputPlanes, inputHeight * inputWidth},
-                grad_output.options());
+  torch::Tensor columns =
+      torch::zeros({kernel_size * nOutputPlanes, inputHeight * inputWidth},
+                   grad_output.options());
 
   // For each elt in batch, do:
   for (int b = 0; b < batchSize; b++) {
-    if (grad_output.dtype() == at::kDouble) {
+    if (grad_output.dtype() == torch::kDouble) {
       MappedIm2Col2D<double>(nOutputPlanes * columns.size(1), grad_output[b],
                              sample_map, outputHeight, outputWidth, inputWidth,
                              columns.size(1), kernel_size, interpolation,
                              columns);
-    } else if (grad_output.dtype() == at::kFloat) {
+    } else if (grad_output.dtype() == torch::kFloat) {
       MappedIm2Col2D<float>(nOutputPlanes * columns.size(1), grad_output[b],
                             sample_map, outputHeight, outputWidth, inputWidth,
                             columns.size(1), kernel_size, interpolation,

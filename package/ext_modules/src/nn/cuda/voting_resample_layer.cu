@@ -1,4 +1,4 @@
-#include <ATen/ATen.h>
+#include <torch/extension.h>
 
 #include "nn/cuda/resample.cuh"
 
@@ -6,9 +6,9 @@ namespace mapped_conv {
 namespace nn {
 namespace cuda {
 
-at::Tensor VotingResampleToMap(at::Tensor input, at::Tensor sample_map,
-                               int outputHeight, int outputWidth,
-                               int numCandidates) {
+torch::Tensor VotingResampleToMap(torch::Tensor input,
+                                  torch::Tensor sample_map, int outputHeight,
+                                  int outputWidth, int numCandidates) {
   // Useful dimensions to have
   const int64_t batchSize   = input.size(0);
   const int64_t channels    = input.size(1);
@@ -16,19 +16,19 @@ at::Tensor VotingResampleToMap(at::Tensor input, at::Tensor sample_map,
   const int64_t inputWidth  = input.size(3);
 
   // Initialize output and index mask
-  at::Tensor output = at::zeros(
+  torch::Tensor output = torch::zeros(
       {batchSize, channels, outputHeight, outputWidth}, input.options());
 
   // Call the CUDA kernel once per batch
   for (int b = 0; b < batchSize; b++) {
-    at::Tensor tmp = at::zeros(
+    torch::Tensor tmp = torch::zeros(
         {channels, outputHeight, outputWidth, numCandidates}, input.options());
     ResampleToMap2DVotingLauncher(input[b], sample_map, channels, inputHeight,
                                   inputWidth, outputHeight, outputWidth,
                                   numCandidates, tmp);
 
     // Compute the index with the most votes
-    at::Tensor argmax = tmp.argmax(-1);
+    torch::Tensor argmax = tmp.argmax(-1);
 
     // Copy the selected indices to the output
     output[b].copy_(argmax);

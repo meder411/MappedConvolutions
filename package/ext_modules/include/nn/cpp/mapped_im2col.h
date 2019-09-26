@@ -1,8 +1,8 @@
 #ifndef MAPPED_IM2COL_H_
 #define MAPPED_IM2COL_H_
 
-#include <ATen/ATen.h>
 #include <omp.h>
+#include <torch/extension.h>
 
 #include "nn/common/mapped_im2col.h"
 
@@ -11,12 +11,12 @@ namespace nn {
 namespace cpu {
 
 template <typename T>
-void MappedIm2Col2D(const int64_t num_kernels, at::Tensor data_im,
-                    at::Tensor sample_map,  //  OH, OW, K, Z
+void MappedIm2Col2D(const int64_t num_kernels, torch::Tensor data_im,
+                    torch::Tensor sample_map,  //  OH, OW, K, Z
                     const int64_t height_im, const int64_t width_im,
                     const int64_t width_out, const int64_t width_col,
                     const int64_t kernel_size, const int64_t interpolation,
-                    at::Tensor data_col) {
+                    torch::Tensor data_col) {
   T *data_col_ptr         = data_col.data<T>();
   const T *data_im_ptr    = data_im.data<T>();
   const T *sample_map_ptr = sample_map.data<T>();
@@ -31,12 +31,12 @@ void MappedIm2Col2D(const int64_t num_kernels, at::Tensor data_im,
 }
 
 template <typename T>
-void MappedCol2Im2D(const int64_t num_kernels, at::Tensor data_col,
-                    at::Tensor sample_map,  // OH, OW, kernel_size, 2
+void MappedCol2Im2D(const int64_t num_kernels, torch::Tensor data_col,
+                    torch::Tensor sample_map,  // OH, OW, kernel_size, 2
                     const int64_t height_im, const int64_t width_im,
                     const int64_t width_out, const int64_t width_col,
                     const int64_t kernel_size, const int64_t interpolation,
-                    at::Tensor data_im) {
+                    torch::Tensor data_im) {
   const T *data_col_ptr   = data_col.data<T>();
   const T *sample_map_ptr = sample_map.data<T>();
   T *data_im_ptr          = data_im.data<T>();
@@ -56,13 +56,13 @@ void MappedCol2Im2D(const int64_t num_kernels, at::Tensor data_col,
 
 template <typename T>
 void MappedIm2Col2DWeighted(
-    const int64_t num_kernels, at::Tensor data_im,
-    at::Tensor sample_map,      // OH, OW, kernel_size, P, 2
-    at::Tensor interp_weights,  // OH, OW, kernel_size, P
+    const int64_t num_kernels, torch::Tensor data_im,
+    torch::Tensor sample_map,      // OH, OW, kernel_size, P, 2
+    torch::Tensor interp_weights,  // OH, OW, kernel_size, P
     const int64_t height_im, const int64_t width_im, const int64_t width_out,
     const int64_t width_col, const int64_t kernel_size,
     const int64_t interpolation, const int64_t num_interp_pts,
-    at::Tensor data_col) {
+    torch::Tensor data_col) {
   T *data_col_ptr             = data_col.data<T>();
   const T *data_im_ptr        = data_im.data<T>();
   const T *sample_map_ptr     = sample_map.data<T>();
@@ -81,13 +81,13 @@ void MappedIm2Col2DWeighted(
 
 template <typename T>
 void MappedCol2Im2DWeighted(
-    const int64_t num_kernels, at::Tensor data_col,
-    at::Tensor sample_map,      // OH, OW, kernel_size, P, 2
-    at::Tensor interp_weights,  // OH, OW, kernel_size, P
+    const int64_t num_kernels, torch::Tensor data_col,
+    torch::Tensor sample_map,      // OH, OW, kernel_size, P, 2
+    torch::Tensor interp_weights,  // OH, OW, kernel_size, P
     const int64_t height_im, const int64_t width_im, const int64_t width_out,
     const int64_t width_col, const int64_t kernel_size,
     const int64_t interpolation, const int64_t num_interp_pts,
-    at::Tensor data_im) {
+    torch::Tensor data_im) {
   const T *data_col_ptr       = data_col.data<T>();
   const T *sample_map_ptr     = sample_map.data<T>();
   const T *interp_weights_ptr = interp_weights.data<T>();

@@ -17,45 +17,43 @@ namespace nn {
 
 #ifndef __NO_CUDA__  // CUDA compilation only
 namespace cuda {
-at::Tensor TransposedConvForward(at::Tensor input, at::Tensor weight,
-                                 at::Tensor bias, int kernel_h, int kernel_w,
-                                 int stride_h, int stride_w, int pad_h,
-                                 int pad_w, int dilation_h, int dilation_w);
+torch::Tensor TransposedConvForward(torch::Tensor input, torch::Tensor weight,
+                                    torch::Tensor bias, int kernel_h,
+                                    int kernel_w, int stride_h, int stride_w,
+                                    int pad_h, int pad_w, int dilation_h,
+                                    int dilation_w);
 
-at::Tensor TransposedConvBackwardInput(at::Tensor grad_output,
-                                       at::Tensor weight, int inputHeight,
-                                       int inputWidth, int kernel_h,
-                                       int kernel_w, int stride_h,
-                                       int stride_w, int pad_h, int pad_w,
-                                       int dilation_h, int dilation_w);
+torch::Tensor TransposedConvBackwardInput(
+    torch::Tensor grad_output, torch::Tensor weight, int inputHeight,
+    int inputWidth, int kernel_h, int kernel_w, int stride_h, int stride_w,
+    int pad_h, int pad_w, int dilation_h, int dilation_w);
 
-at::Tensor TransposedConvBackwardWeight(at::Tensor grad_output,
-                                        at::Tensor input, int kernel_h,
-                                        int kernel_w, int stride_h,
-                                        int stride_w, int pad_h, int pad_w,
-                                        int dilation_h, int dilation_w);
+torch::Tensor TransposedConvBackwardWeight(torch::Tensor grad_output,
+                                           torch::Tensor input, int kernel_h,
+                                           int kernel_w, int stride_h,
+                                           int stride_w, int pad_h, int pad_w,
+                                           int dilation_h, int dilation_w);
 }  // namespace cuda
 #endif
 
 namespace cpu {
 
-at::Tensor TransposedConvForward(at::Tensor input, at::Tensor weight,
-                                 at::Tensor bias, int kernel_h, int kernel_w,
-                                 int stride_h, int stride_w, int pad_h,
-                                 int pad_w, int dilation_h, int dilation_w);
+torch::Tensor TransposedConvForward(torch::Tensor input, torch::Tensor weight,
+                                    torch::Tensor bias, int kernel_h,
+                                    int kernel_w, int stride_h, int stride_w,
+                                    int pad_h, int pad_w, int dilation_h,
+                                    int dilation_w);
 
-at::Tensor TransposedConvBackwardInput(at::Tensor grad_output,
-                                       at::Tensor weight, int inputHeight,
-                                       int inputWidth, int kernel_h,
-                                       int kernel_w, int stride_h,
-                                       int stride_w, int pad_h, int pad_w,
-                                       int dilation_h, int dilation_w);
+torch::Tensor TransposedConvBackwardInput(
+    torch::Tensor grad_output, torch::Tensor weight, int inputHeight,
+    int inputWidth, int kernel_h, int kernel_w, int stride_h, int stride_w,
+    int pad_h, int pad_w, int dilation_h, int dilation_w);
 
-at::Tensor TransposedConvBackwardWeight(at::Tensor grad_output,
-                                        at::Tensor input, int kernel_h,
-                                        int kernel_w, int stride_h,
-                                        int stride_w, int pad_h, int pad_w,
-                                        int dilation_h, int dilation_w);
+torch::Tensor TransposedConvBackwardWeight(torch::Tensor grad_output,
+                                           torch::Tensor input, int kernel_h,
+                                           int kernel_w, int stride_h,
+                                           int stride_w, int pad_h, int pad_w,
+                                           int dilation_h, int dilation_w);
 }  // namespace cpu
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -64,10 +62,11 @@ at::Tensor TransposedConvBackwardWeight(at::Tensor grad_output,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-at::Tensor TransposedConvForward(at::Tensor input, at::Tensor weight,
-                                 at::Tensor bias, int kernel_h, int kernel_w,
-                                 int stride_h, int stride_w, int pad_h,
-                                 int pad_w, int dilation_h, int dilation_w) {
+torch::Tensor TransposedConvForward(torch::Tensor input, torch::Tensor weight,
+                                    torch::Tensor bias, int kernel_h,
+                                    int kernel_w, int stride_h, int stride_w,
+                                    int pad_h, int pad_w, int dilation_h,
+                                    int dilation_w) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(weight);
   CHECK_CONTIGUOUS(bias);
@@ -92,9 +91,9 @@ at::Tensor TransposedConvForward(at::Tensor input, at::Tensor weight,
   }
 }
 
-std::vector<at::Tensor> TransposedConvBackward(
-    at::Tensor grad_output, at::Tensor input, at::Tensor weight,
-    at::Tensor bias, int kernel_h, int kernel_w, int stride_h, int stride_w,
+std::vector<torch::Tensor> TransposedConvBackward(
+    torch::Tensor grad_output, torch::Tensor input, torch::Tensor weight,
+    torch::Tensor bias, int kernel_h, int kernel_w, int stride_h, int stride_w,
     int pad_h, int pad_w, int dilation_h, int dilation_w) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(weight);
@@ -106,15 +105,15 @@ std::vector<at::Tensor> TransposedConvBackward(
     CHECK_CUDA(weight);
     CHECK_CUDA(bias);
 
-    at::Tensor grad_input = cuda::TransposedConvBackwardInput(
+    torch::Tensor grad_input = cuda::TransposedConvBackwardInput(
         grad_output, weight, input.size(2), input.size(3), kernel_h, kernel_w,
         stride_h, stride_w, pad_h, pad_w, dilation_h, dilation_w);
 
-    at::Tensor grad_weight = cuda::TransposedConvBackwardWeight(
+    torch::Tensor grad_weight = cuda::TransposedConvBackwardWeight(
         grad_output, input, kernel_h, kernel_w, stride_h, stride_w, pad_h,
         pad_w, dilation_h, dilation_w);
 
-    at::Tensor grad_bias = grad_output.sum({0, 2, 3});
+    torch::Tensor grad_bias = grad_output.sum({0, 2, 3});
 
     return {grad_input, grad_weight, grad_bias};
   } else
@@ -124,15 +123,15 @@ std::vector<at::Tensor> TransposedConvBackward(
     CHECK_CPU(weight);
     CHECK_CPU(bias);
 
-    at::Tensor grad_input = cpu::TransposedConvBackwardInput(
+    torch::Tensor grad_input = cpu::TransposedConvBackwardInput(
         grad_output, weight, input.size(2), input.size(3), kernel_h, kernel_w,
         stride_h, stride_w, pad_h, pad_w, dilation_h, dilation_w);
 
-    at::Tensor grad_weight = cpu::TransposedConvBackwardWeight(
+    torch::Tensor grad_weight = cpu::TransposedConvBackwardWeight(
         grad_output, input, kernel_h, kernel_w, stride_h, stride_w, pad_h,
         pad_w, dilation_h, dilation_w);
 
-    at::Tensor grad_bias = grad_output.sum({0, 2, 3});
+    torch::Tensor grad_bias = grad_output.sum({0, 2, 3});
 
     return {grad_input, grad_weight, grad_bias};
   }

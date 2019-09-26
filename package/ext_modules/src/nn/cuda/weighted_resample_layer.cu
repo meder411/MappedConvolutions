@@ -1,4 +1,4 @@
-#include <ATen/ATen.h>
+#include <torch/extension.h>
 
 #include "nn/cuda/resample.cuh"
 
@@ -6,9 +6,11 @@ namespace mapped_conv {
 namespace nn {
 namespace cuda {
 
-at::Tensor WeightedResampleToMap(at::Tensor input, at::Tensor sample_map,
-                                 at::Tensor interp_weights, int outputHeight,
-                                 int outputWidth, int interpolation) {
+torch::Tensor WeightedResampleToMap(torch::Tensor input,
+                                    torch::Tensor sample_map,
+                                    torch::Tensor interp_weights,
+                                    int outputHeight, int outputWidth,
+                                    int interpolation) {
   // Useful dimensions to have
   const int64_t batchSize      = input.size(0);
   const int64_t channels       = input.size(1);
@@ -17,7 +19,7 @@ at::Tensor WeightedResampleToMap(at::Tensor input, at::Tensor sample_map,
   const int64_t num_interp_pts = interp_weights.size(2);
 
   // Initialize output and index mask
-  at::Tensor output = at::zeros(
+  torch::Tensor output = torch::zeros(
       {batchSize, channels, outputHeight, outputWidth}, input.options());
 
   // Call the CUDA kernel once per batch
@@ -31,10 +33,10 @@ at::Tensor WeightedResampleToMap(at::Tensor input, at::Tensor sample_map,
   return output;
 }
 
-at::Tensor WeightedResampleFromMap(at::Tensor grad_output,
-                                   at::Tensor sample_map,
-                                   at::Tensor interp_weights,
-                                   int interpolation) {
+torch::Tensor WeightedResampleFromMap(torch::Tensor grad_output,
+                                      torch::Tensor sample_map,
+                                      torch::Tensor interp_weights,
+                                      int interpolation) {
   // Useful dimensions to have
   const int64_t batchSize      = grad_output.size(0);
   const int64_t channels       = grad_output.size(1);
@@ -45,8 +47,8 @@ at::Tensor WeightedResampleFromMap(at::Tensor grad_output,
   const int64_t num_interp_pts = interp_weights.size(2);
 
   // Initialize output and index mask
-  at::Tensor input = at::zeros({batchSize, channels, inputHeight, inputWidth},
-                               grad_output.options());
+  torch::Tensor input = torch::zeros(
+      {batchSize, channels, inputHeight, inputWidth}, grad_output.options());
 
   // Call the CUDA kernel once per batch
   for (int b = 0; b < batchSize; b++) {

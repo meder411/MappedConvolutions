@@ -11,8 +11,8 @@ namespace util {
 
 #ifndef __NO_CUDA__
 namespace cuda {
-std::vector<at::Tensor> KNNForward(at::Tensor ref,  // B x D x N
-                                   at::Tensor query, const int64_t k);
+std::vector<torch::Tensor> KNNForward(torch::Tensor ref,  // B x D x N
+                                      torch::Tensor query, const int64_t k);
 }  // namespace cuda
 #endif
 
@@ -22,8 +22,8 @@ std::vector<at::Tensor> KNNForward(at::Tensor ref,  // B x D x N
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-std::vector<at::Tensor> KNNForward(at::Tensor ref, at::Tensor query,
-                                   const int64_t k) {
+std::vector<torch::Tensor> KNNForward(torch::Tensor ref, torch::Tensor query,
+                                      const int64_t k) {
 #ifndef __NO_CUDA__
   CHECK_INPUT(ref);
   CHECK_INPUT(query);

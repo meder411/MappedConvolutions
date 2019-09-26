@@ -11,32 +11,26 @@ namespace nn {
 
 #ifndef __NO_CUDA__  // CUDA compilation only
 namespace cuda {
-std::vector<at::Tensor> WeightedMappedMaxPoolForward(at::Tensor input,
-                                                     at::Tensor sample_map,
-                                                     at::Tensor interp_weights,
-                                                     int kernel_size,
-                                                     int interpolation);
+std::vector<torch::Tensor> WeightedMappedMaxPoolForward(
+    torch::Tensor input, torch::Tensor sample_map,
+    torch::Tensor interp_weights, int kernel_size, int interpolation);
 
-at::Tensor WeightedMappedMaxPoolBackward(at::Tensor input, at::Tensor idx_mask,
-                                         at::Tensor sample_map,
-                                         at::Tensor interp_weights,
-                                         int inputHeight, int inputWidth,
-                                         int kernel_size, int interpolation);
+torch::Tensor WeightedMappedMaxPoolBackward(
+    torch::Tensor input, torch::Tensor idx_mask, torch::Tensor sample_map,
+    torch::Tensor interp_weights, int inputHeight, int inputWidth,
+    int kernel_size, int interpolation);
 }  // namespace cuda
 #endif
 
 namespace cpu {
-std::vector<at::Tensor> WeightedMappedMaxPoolForward(at::Tensor input,
-                                                     at::Tensor sample_map,
-                                                     at::Tensor interp_weights,
-                                                     int kernel_size,
-                                                     int interpolation);
+std::vector<torch::Tensor> WeightedMappedMaxPoolForward(
+    torch::Tensor input, torch::Tensor sample_map,
+    torch::Tensor interp_weights, int kernel_size, int interpolation);
 
-at::Tensor WeightedMappedMaxPoolBackward(at::Tensor input, at::Tensor idx_mask,
-                                         at::Tensor sample_map,
-                                         at::Tensor interp_weights,
-                                         int inputHeight, int inputWidth,
-                                         int kernel_size, int interpolation);
+torch::Tensor WeightedMappedMaxPoolBackward(
+    torch::Tensor input, torch::Tensor idx_mask, torch::Tensor sample_map,
+    torch::Tensor interp_weights, int inputHeight, int inputWidth,
+    int kernel_size, int interpolation);
 }  // namespace cpu
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -45,11 +39,9 @@ at::Tensor WeightedMappedMaxPoolBackward(at::Tensor input, at::Tensor idx_mask,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-std::vector<at::Tensor> WeightedMappedMaxPoolForward(at::Tensor input,
-                                                     at::Tensor sample_map,
-                                                     at::Tensor interp_weights,
-                                                     int kernel_size,
-                                                     int interpolation) {
+std::vector<torch::Tensor> WeightedMappedMaxPoolForward(
+    torch::Tensor input, torch::Tensor sample_map,
+    torch::Tensor interp_weights, int kernel_size, int interpolation) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(sample_map);
   CHECK_CONTIGUOUS(interp_weights);
@@ -72,11 +64,10 @@ std::vector<at::Tensor> WeightedMappedMaxPoolForward(at::Tensor input,
   }
 }
 
-at::Tensor WeightedMappedMaxPoolBackward(at::Tensor input, at::Tensor idx_mask,
-                                         at::Tensor sample_map,
-                                         at::Tensor interp_weights,
-                                         int inputHeight, int inputWidth,
-                                         int kernel_size, int interpolation) {
+torch::Tensor WeightedMappedMaxPoolBackward(
+    torch::Tensor input, torch::Tensor idx_mask, torch::Tensor sample_map,
+    torch::Tensor interp_weights, int inputHeight, int inputWidth,
+    int kernel_size, int interpolation) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(idx_mask);
   CHECK_CONTIGUOUS(sample_map);

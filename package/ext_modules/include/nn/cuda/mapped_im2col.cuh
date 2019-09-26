@@ -1,7 +1,7 @@
 #ifndef MAPPED_IM2COL_CUH_
 #define MAPPED_IM2COL_CUH_
 
-#include <ATen/ATen.h>
+#include <torch/extension.h>
 
 #include "cuda_helper.h"
 #include "nn/common/mapped_im2col.h"
@@ -25,19 +25,20 @@ __global__ void MappedIm2Col2DKernel(
                          interpolation, data_col_ptr);
 }
 
-void MappedIm2Col2DLauncher(at::Tensor data_im,
-                            at::Tensor sample_map,  // OH, OW, KH, KW, 2
+void MappedIm2Col2DLauncher(torch::Tensor data_im,
+                            torch::Tensor sample_map,  // OH, OW, KH, KW, 2
                             const int64_t channels, const int64_t height_im,
                             const int64_t width_im, const int64_t width_out,
                             const int64_t width_col, const int64_t kernel_size,
-                            const int64_t interpolation, at::Tensor data_col) {
+                            const int64_t interpolation,
+                            torch::Tensor data_col) {
   const int64_t num_kernels = channels * width_col;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
   // Launch channels * width_col kernels, with each kernel responsible for
   // copying a the convolutions over a single channel.
   AT_DISPATCH_FLOATING_TYPES(
-      data_col.type(), "MappedIm2Col2DLauncher", ([&] {
+      data_col.scalar_type(), "MappedIm2Col2DLauncher", ([&] {
         MappedIm2Col2DKernel<<<blocks, CUDA_NUM_THREADS>>>(
             num_kernels, data_im.data<scalar_t>(), sample_map.data<scalar_t>(),
             height_im, width_im, width_out, width_col, kernel_size,
@@ -62,12 +63,13 @@ __global__ void MappedCol2Im2DKernel(
                          kernel_size, interpolation, data_im_ptr);
 }
 
-void MappedCol2Im2DLauncher(at::Tensor data_col,
-                            at::Tensor sample_map,  // OH, OW, KH, KW, 2
+void MappedCol2Im2DLauncher(torch::Tensor data_col,
+                            torch::Tensor sample_map,  // OH, OW, KH, KW, 2
                             const int64_t channels, const int64_t height_im,
                             const int64_t width_im, const int64_t width_out,
                             const int64_t width_col, const int64_t kernel_size,
-                            const int64_t interpolation, at::Tensor data_im) {
+                            const int64_t interpolation,
+                            torch::Tensor data_im) {
   const int64_t num_kernels = channels * width_col;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
@@ -77,7 +79,7 @@ void MappedCol2Im2DLauncher(at::Tensor data_col,
   // because we determine the input image locations from the mapping, rather
   // than a search over the kernel extent.
   AT_DISPATCH_FLOATING_TYPES(
-      data_col.type(), "MappedCol2Im2DLauncher", ([&] {
+      data_col.scalar_type(), "MappedCol2Im2DLauncher", ([&] {
         MappedCol2Im2DKernel<scalar_t><<<blocks, CUDA_NUM_THREADS>>>(
             num_kernels, data_col.data<scalar_t>(),
             sample_map.data<scalar_t>(), height_im, width_im, width_out,
@@ -107,20 +109,20 @@ __global__ void MappedIm2Col2DWeightedKernel(
 }
 
 void MappedIm2Col2DWeightedLauncher(
-    at::Tensor data_im,
-    at::Tensor sample_map,      // OH, OW, KH, KW, P, 2
-    at::Tensor interp_weights,  // OH, OW, KH, KW, P
+    torch::Tensor data_im,
+    torch::Tensor sample_map,      // OH, OW, KH, KW, P, 2
+    torch::Tensor interp_weights,  // OH, OW, KH, KW, P
     const int64_t channels, const int64_t height_im, const int64_t width_im,
     const int64_t width_out, const int64_t width_col,
     const int64_t kernel_size, const int64_t interpolation,
-    const int64_t num_interp_pts, at::Tensor data_col) {
+    const int64_t num_interp_pts, torch::Tensor data_col) {
   const int64_t num_kernels = channels * width_col;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
   // Launch channels * width_col kernels, with each kernel responsible for
   // copying a the convolutions over a single channel.
   AT_DISPATCH_FLOATING_TYPES(
-      data_col.type(), "MappedIm2Col2DWeightedLauncher", ([&] {
+      data_col.scalar_type(), "MappedIm2Col2DWeightedLauncher", ([&] {
         MappedIm2Col2DWeightedKernel<<<blocks, CUDA_NUM_THREADS>>>(
             num_kernels, data_im.data<scalar_t>(), sample_map.data<scalar_t>(),
             interp_weights.data<scalar_t>(), height_im, width_im, width_out,
@@ -151,13 +153,13 @@ __global__ void MappedCol2Im2DWeightedKernel(
 }
 
 void MappedCol2Im2DWeightedLauncher(
-    at::Tensor data_col,
-    at::Tensor sample_map,      // OH, OW, KH, KW, P, 2
-    at::Tensor interp_weights,  // OH, OW, KH, KW, P
+    torch::Tensor data_col,
+    torch::Tensor sample_map,      // OH, OW, KH, KW, P, 2
+    torch::Tensor interp_weights,  // OH, OW, KH, KW, P
     const int64_t channels, const int64_t height_im, const int64_t width_im,
     const int64_t width_out, const int64_t width_col,
     const int64_t kernel_size, const int64_t interpolation,
-    const int64_t num_interp_pts, at::Tensor data_im) {
+    const int64_t num_interp_pts, torch::Tensor data_im) {
   const int64_t num_kernels = channels * width_col;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
@@ -167,7 +169,7 @@ void MappedCol2Im2DWeightedLauncher(
   // because we determine the input image locations from the mapping, rather
   // than a search over the kernel extent.
   AT_DISPATCH_FLOATING_TYPES(
-      data_col.type(), "MappedCol2Im2DWeightedLauncher", ([&] {
+      data_col.scalar_type(), "MappedCol2Im2DWeightedLauncher", ([&] {
         MappedCol2Im2DWeightedKernel<scalar_t><<<blocks, CUDA_NUM_THREADS>>>(
             num_kernels, data_col.data<scalar_t>(),
             sample_map.data<scalar_t>(), interp_weights.data<scalar_t>(),

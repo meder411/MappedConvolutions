@@ -229,9 +229,9 @@ __global__ void cuParallelSqrt(T *dist, int width, int k) {
  * matrix
  *
  */
-void KNNLauncher(at::Tensor ref, int num_ref_pts, at::Tensor query,
-                 int num_query_pts, int dim, int k, at::Tensor dist,
-                 at::Tensor idx, cudaStream_t stream) {
+void KNNLauncher(torch::Tensor ref, int num_ref_pts, torch::Tensor query,
+                 int num_query_pts, int dim, int k, torch::Tensor dist,
+                 torch::Tensor idx, cudaStream_t stream) {
   // Grids ans threads
   dim3 g_16x16(num_query_pts / 16, num_ref_pts / 16, 1);
   dim3 t_16x16(16, 16, 1);
@@ -249,7 +249,7 @@ void KNNLauncher(at::Tensor ref, int num_ref_pts, at::Tensor query,
 
   // Kernel 1: Compute all the distances
   AT_DISPATCH_FLOATING_TYPES(
-      ref.type(), "cuComputeDistanceGlobal", ([&] {
+      ref.scalar_type(), "cuComputeDistanceGlobal", ([&] {
         cuComputeDistanceGlobal<scalar_t><<<g_16x16, t_16x16, 0, stream>>>(
             ref.data<scalar_t>(), num_ref_pts, query.data<scalar_t>(),
             num_query_pts, dim, dist.data<scalar_t>());
@@ -258,7 +258,7 @@ void KNNLauncher(at::Tensor ref, int num_ref_pts, at::Tensor query,
 
   // Kernel 2: Sort each column
   AT_DISPATCH_FLOATING_TYPES(
-      ref.type(), "cuInsertionSort", ([&] {
+      ref.scalar_type(), "cuInsertionSort", ([&] {
         cuInsertionSort<<<g_256x1, t_256x1, 0, stream>>>(
             dist.data<scalar_t>(), idx.data<int64_t>(), num_query_pts,
             num_ref_pts, k);
@@ -267,7 +267,7 @@ void KNNLauncher(at::Tensor ref, int num_ref_pts, at::Tensor query,
 
   // Kernel 3: Compute square root of k first elements
   AT_DISPATCH_FLOATING_TYPES(
-      ref.type(), "cuInsertionSort", ([&] {
+      ref.scalar_type(), "cuInsertionSort", ([&] {
         cuParallelSqrt<<<g_k_16x16, t_k_16x16, 0, stream>>>(
             dist.data<scalar_t>(), num_query_pts, k);
       }));

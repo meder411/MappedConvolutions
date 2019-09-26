@@ -97,7 +97,7 @@ void find_pairs(
   }
 }
 
-Sphere::Sphere(at::Tensor pts, at::Tensor faces) {
+Sphere::Sphere(torch::Tensor pts, torch::Tensor faces) {
   const size_t num_pts   = pts.size(0);
   const size_t num_faces = faces.size(0);
   this->_buildSphere(pts.data<float>(), num_pts, faces.data<int64_t>(),
@@ -542,9 +542,9 @@ const Sphere Sphere::generateIcosphere(const size_t order) {
 // PUBLIC FUNCTIONS
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // Returns V x 3
-const at::Tensor Sphere::getVertices() const {
-  at::Tensor at_vertices =
-      torch::zeros({static_cast<int64_t>(_vertices.size()), 3}, at::kFloat);
+const torch::Tensor Sphere::getVertices() const {
+  torch::Tensor at_vertices =
+      torch::zeros({static_cast<int64_t>(_vertices.size()), 3}, torch::kFloat);
 
   size_t i;
   float *at_vertices_ptr = at_vertices.data<float>();
@@ -557,9 +557,9 @@ const at::Tensor Sphere::getVertices() const {
 }
 
 // Returns F x 3 x 3, F sets of 3 rows of points
-const at::Tensor Sphere::getAllFaceVertexCoordinates() const {
-  at::Tensor at_coords =
-      torch::zeros({static_cast<int64_t>(_faces.size()), 3, 3}, at::kFloat);
+const torch::Tensor Sphere::getAllFaceVertexCoordinates() const {
+  torch::Tensor at_coords =
+      torch::zeros({static_cast<int64_t>(_faces.size()), 3, 3}, torch::kFloat);
 
   size_t i;
   float *at_coords_ptr = at_coords.data<float>();
@@ -575,9 +575,9 @@ const at::Tensor Sphere::getAllFaceVertexCoordinates() const {
 }
 
 // Returns F x 3, F rows of 3 indices
-const at::Tensor Sphere::getAllFaceVertexIndices() const {
-  at::Tensor at_indices =
-      torch::zeros({static_cast<int64_t>(_faces.size()), 3}, at::kLong);
+const torch::Tensor Sphere::getAllFaceVertexIndices() const {
+  torch::Tensor at_indices =
+      torch::zeros({static_cast<int64_t>(_faces.size()), 3}, torch::kLong);
 
   size_t i;
   int64_t *at_indices_ptr = at_indices.data<int64_t>();
@@ -591,9 +591,9 @@ const at::Tensor Sphere::getAllFaceVertexIndices() const {
 }
 
 // Returns F x 3
-const at::Tensor Sphere::getFaceBarycenters() const {
-  at::Tensor at_barycenters =
-      torch::zeros({static_cast<int64_t>(_faces.size()), 3}, at::kFloat);
+const torch::Tensor Sphere::getFaceBarycenters() const {
+  torch::Tensor at_barycenters =
+      torch::zeros({static_cast<int64_t>(_faces.size()), 3}, torch::kFloat);
 
   size_t i;
   float *at_barycenters_ptr = at_barycenters.data<float>();
@@ -628,9 +628,9 @@ const float Sphere::getVertexResolution() const {
 }
 
 // Returns F x 3
-const at::Tensor Sphere::getAdjacentFaceIndicesToFaces() const {
-  at::Tensor at_indices =
-      torch::zeros({static_cast<int64_t>(_faces.size()), 3}, at::kLong);
+const torch::Tensor Sphere::getAdjacentFaceIndicesToFaces() const {
+  torch::Tensor at_indices =
+      torch::zeros({static_cast<int64_t>(_faces.size()), 3}, torch::kLong);
 
   size_t i;
   int64_t *at_indices_ptr = at_indices.data<int64_t>();
@@ -644,9 +644,10 @@ const at::Tensor Sphere::getAdjacentFaceIndicesToFaces() const {
 }
 
 // Returns V x 6 (a value of -1 implies no adjacent face)
-const at::Tensor Sphere::getAdjacentFaceIndicesToVertices() const {
-  at::Tensor at_indices =
-      -1 * torch::ones({static_cast<int64_t>(_vertices.size()), 6}, at::kLong);
+const torch::Tensor Sphere::getAdjacentFaceIndicesToVertices() const {
+  torch::Tensor at_indices =
+      -1 *
+      torch::ones({static_cast<int64_t>(_vertices.size()), 6}, torch::kLong);
 
   size_t i;
   int64_t *at_indices_ptr = at_indices.data<int64_t>();
@@ -661,9 +662,10 @@ const at::Tensor Sphere::getAdjacentFaceIndicesToVertices() const {
 }
 
 // Returns V x 6 (a value of -1 implies no adjacent vertex)
-const at::Tensor Sphere::getAdjacentVertexIndicesToVertices() const {
-  at::Tensor at_indices =
-      -1 * torch::ones({static_cast<int64_t>(_vertices.size()), 6}, at::kLong);
+const torch::Tensor Sphere::getAdjacentVertexIndicesToVertices() const {
+  torch::Tensor at_indices =
+      -1 *
+      torch::ones({static_cast<int64_t>(_vertices.size()), 6}, torch::kLong);
 
   size_t i;
   int64_t *at_indices_ptr = at_indices.data<int64_t>();
@@ -678,9 +680,10 @@ const at::Tensor Sphere::getAdjacentVertexIndicesToVertices() const {
 }
 
 // Returns F x 13 (a value of -1 implies no adjacent face)
-const at::Tensor Sphere::getAllFaceConvolutionOperatorIndicesDeg1() const {
-  at::Tensor at_indices =
-      -1 * torch::ones({static_cast<int64_t>(_faces.size()), 13}, at::kLong);
+const torch::Tensor Sphere::getAllFaceConvolutionOperatorIndicesDeg1() const {
+  torch::Tensor at_indices =
+      -1 *
+      torch::ones({static_cast<int64_t>(_faces.size()), 13}, torch::kLong);
 
   size_t i;
   int64_t *at_indices_ptr = at_indices.data<int64_t>();
@@ -696,14 +699,14 @@ const at::Tensor Sphere::getAllFaceConvolutionOperatorIndicesDeg1() const {
 }
 
 // Returns F x 37 (a value of -1 implies no adjacent face)
-const at::Tensor Sphere::getAllFaceConvolutionOperatorIndicesDeg2(
+const torch::Tensor Sphere::getAllFaceConvolutionOperatorIndicesDeg2(
     const bool dilation) const {
   size_t ksize = 37;
   if (dilation) { ksize = 25; }
-  at::Tensor at_indices =
+  torch::Tensor at_indices =
       -1 * torch::ones({static_cast<int64_t>(_faces.size()),
                         static_cast<int64_t>(ksize)},
-                       at::kLong);
+                       torch::kLong);
 
   size_t i;
   int64_t *at_indices_ptr = at_indices.data<int64_t>();
@@ -721,9 +724,9 @@ const at::Tensor Sphere::getAllFaceConvolutionOperatorIndicesDeg2(
 }
 
 // Returns F x 0
-const at::Tensor Sphere::getOriginalFaceIndices() const {
-  at::Tensor at_indices =
-      torch::zeros({static_cast<int64_t>(_faces.size())}, at::kLong);
+const torch::Tensor Sphere::getOriginalFaceIndices() const {
+  torch::Tensor at_indices =
+      torch::zeros({static_cast<int64_t>(_faces.size())}, torch::kLong);
 
   size_t i;
   int64_t *at_indices_ptr = at_indices.data<int64_t>();
@@ -918,7 +921,7 @@ const Sphere Sphere::loopSubdivision(const size_t iterations) const {
 }
 
 // Scale tensor should be length V
-void Sphere::scaleVertices(at::Tensor scale) {
+void Sphere::scaleVertices(torch::Tensor scale) {
   size_t i;
   const float *scale_tensor_ptr = scale.data<float>();
   auto vertices_ptr             = _vertices.data();
@@ -929,9 +932,9 @@ void Sphere::scaleVertices(at::Tensor scale) {
 }
 
 // Returns F x 3
-const at::Tensor Sphere::getFaceNormals() const {
-  at::Tensor at_normals =
-      torch::zeros({static_cast<int64_t>(_faces.size()), 3}, at::kFloat);
+const torch::Tensor Sphere::getFaceNormals() const {
+  torch::Tensor at_normals =
+      torch::zeros({static_cast<int64_t>(_faces.size()), 3}, torch::kFloat);
 
   size_t i;
   float *at_normals_ptr = at_normals.data<float>();
@@ -945,9 +948,9 @@ const at::Tensor Sphere::getFaceNormals() const {
 }
 
 // Returns V x 3
-const at::Tensor Sphere::getVertexNormals() const {
-  at::Tensor at_normals =
-      torch::zeros({static_cast<int64_t>(_vertices.size()), 3}, at::kFloat);
+const torch::Tensor Sphere::getVertexNormals() const {
+  torch::Tensor at_normals =
+      torch::zeros({static_cast<int64_t>(_vertices.size()), 3}, torch::kFloat);
 
   size_t i;
   float *at_normals_ptr = at_normals.data<float>();
@@ -1110,40 +1113,42 @@ const size_t maxOfThreeValues(const float s, const float t, const float u) {
 
 // Returns {Oh x OW x K, Oh x Ow x K x 3, Oh x OW x K x 3}
 // samples is OH x OW x K x 2
-const std::vector<at::Tensor> Sphere::getPlanarConvolutionOperatorFromSamples(
-    at::Tensor samples, const size_t order, const bool keepdim,
-    const bool nearest) {
+const std::vector<torch::Tensor>
+Sphere::getPlanarConvolutionOperatorFromSamples(torch::Tensor samples,
+                                                const size_t order,
+                                                const bool keepdim,
+                                                const bool nearest) {
   // Create the the output tensor
   const size_t samples_height = samples.size(0);
   const size_t samples_width  = samples.size(1);
   const size_t kernel_size    = (samples.dim() == 3) ? 1 : samples.size(2);
 
-  at::Tensor at_face_indices;
-  at::Tensor at_vertex_indices;
-  at::Tensor at_weights;
+  torch::Tensor at_face_indices;
+  torch::Tensor at_vertex_indices;
+  torch::Tensor at_weights;
   if (kernel_size > 1 || (kernel_size == 1 && keepdim)) {
     at_face_indices   = torch::zeros({static_cast<int64_t>(samples_height),
                                     static_cast<int64_t>(samples_width),
                                     static_cast<int64_t>(kernel_size)},
-                                   at::kLong);
+                                   torch::kLong);
     at_vertex_indices = torch::zeros({static_cast<int64_t>(samples_height),
                                       static_cast<int64_t>(samples_width),
                                       static_cast<int64_t>(kernel_size), 3},
-                                     at::kLong);
+                                     torch::kLong);
     at_weights        = torch::zeros({static_cast<int64_t>(samples_height),
                                static_cast<int64_t>(samples_width),
                                static_cast<int64_t>(kernel_size), 3},
-                              at::kFloat);
+                              torch::kFloat);
   } else {
     at_face_indices   = torch::zeros({static_cast<int64_t>(samples_height),
                                     static_cast<int64_t>(samples_width)},
-                                   at::kLong);
+                                   torch::kLong);
     at_vertex_indices = torch::zeros({static_cast<int64_t>(samples_height),
                                       static_cast<int64_t>(samples_width), 3},
-                                     at::kLong);
+                                     torch::kLong);
     at_weights        = torch::zeros({static_cast<int64_t>(samples_height),
                                static_cast<int64_t>(samples_width), 3},
-                              at::kFloat);
+                              torch::kFloat);
   }
 
   const auto at_sample_coords_ptr = samples.data<float>();

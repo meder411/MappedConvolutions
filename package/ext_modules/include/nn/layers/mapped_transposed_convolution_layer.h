@@ -17,38 +17,42 @@ namespace nn {
 
 #ifndef __NO_CUDA__  // CUDA compilation only
 namespace cuda {
-at::Tensor MappedTransposedConvForward(at::Tensor input, at::Tensor sample_map,
-                                       at::Tensor weight, at::Tensor bias,
-                                       int outputHeight, int outputWidth,
-                                       int kernel_size, int interpolation);
+torch::Tensor MappedTransposedConvForward(torch::Tensor input,
+                                          torch::Tensor sample_map,
+                                          torch::Tensor weight,
+                                          torch::Tensor bias, int outputHeight,
+                                          int outputWidth, int kernel_size,
+                                          int interpolation);
 
-at::Tensor MappedTransposedConvBackwardInput(
-    at::Tensor grad_output, at::Tensor sample_map, at::Tensor weight,
+torch::Tensor MappedTransposedConvBackwardInput(
+    torch::Tensor grad_output, torch::Tensor sample_map, torch::Tensor weight,
     int inputHeight, int inputWidth, int kernel_size, int interpolation);
 
-at::Tensor MappedTransposedConvBackwardWeight(at::Tensor grad_output,
-                                              at::Tensor sample_map,
-                                              at::Tensor input,
-                                              int kernel_size,
-                                              int interpolation);
+torch::Tensor MappedTransposedConvBackwardWeight(torch::Tensor grad_output,
+                                                 torch::Tensor sample_map,
+                                                 torch::Tensor input,
+                                                 int kernel_size,
+                                                 int interpolation);
 }  // namespace cuda
 #endif
 
 namespace cpu {
-at::Tensor MappedTransposedConvForward(at::Tensor input, at::Tensor sample_map,
-                                       at::Tensor weight, at::Tensor bias,
-                                       int outputHeight, int outputWidth,
-                                       int kernel_size, int interpolation);
+torch::Tensor MappedTransposedConvForward(torch::Tensor input,
+                                          torch::Tensor sample_map,
+                                          torch::Tensor weight,
+                                          torch::Tensor bias, int outputHeight,
+                                          int outputWidth, int kernel_size,
+                                          int interpolation);
 
-at::Tensor MappedTransposedConvBackwardInput(
-    at::Tensor grad_output, at::Tensor sample_map, at::Tensor weight,
+torch::Tensor MappedTransposedConvBackwardInput(
+    torch::Tensor grad_output, torch::Tensor sample_map, torch::Tensor weight,
     int inputHeight, int inputWidth, int kernel_size, int interpolation);
 
-at::Tensor MappedTransposedConvBackwardWeight(at::Tensor grad_output,
-                                              at::Tensor sample_map,
-                                              at::Tensor input,
-                                              int kernel_size,
-                                              int interpolation);
+torch::Tensor MappedTransposedConvBackwardWeight(torch::Tensor grad_output,
+                                                 torch::Tensor sample_map,
+                                                 torch::Tensor input,
+                                                 int kernel_size,
+                                                 int interpolation);
 }  // namespace cpu
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -57,10 +61,12 @@ at::Tensor MappedTransposedConvBackwardWeight(at::Tensor grad_output,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-at::Tensor MappedTransposedConvForward(at::Tensor input, at::Tensor sample_map,
-                                       at::Tensor weight, at::Tensor bias,
-                                       int outputHeight, int outputWidth,
-                                       int kernel_size, int interpolation) {
+torch::Tensor MappedTransposedConvForward(torch::Tensor input,
+                                          torch::Tensor sample_map,
+                                          torch::Tensor weight,
+                                          torch::Tensor bias, int outputHeight,
+                                          int outputWidth, int kernel_size,
+                                          int interpolation) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(sample_map);
   CHECK_CONTIGUOUS(weight);
@@ -88,9 +94,10 @@ at::Tensor MappedTransposedConvForward(at::Tensor input, at::Tensor sample_map,
   }
 }
 
-std::vector<at::Tensor> MappedTransposedConvBackward(
-    at::Tensor grad_output, at::Tensor sample_map, at::Tensor input,
-    at::Tensor weight, at::Tensor bias, int kernel_size, int interpolation) {
+std::vector<torch::Tensor> MappedTransposedConvBackward(
+    torch::Tensor grad_output, torch::Tensor sample_map, torch::Tensor input,
+    torch::Tensor weight, torch::Tensor bias, int kernel_size,
+    int interpolation) {
   CHECK_CONTIGUOUS(sample_map);
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(weight);
@@ -103,14 +110,14 @@ std::vector<at::Tensor> MappedTransposedConvBackward(
     CHECK_CUDA(weight);
     CHECK_CUDA(bias);
 
-    at::Tensor grad_input = cuda::MappedTransposedConvBackwardInput(
+    torch::Tensor grad_input = cuda::MappedTransposedConvBackwardInput(
         grad_output, sample_map, weight, input.size(2), input.size(3),
         kernel_size, interpolation);
 
-    at::Tensor grad_weight = cuda::MappedTransposedConvBackwardWeight(
+    torch::Tensor grad_weight = cuda::MappedTransposedConvBackwardWeight(
         grad_output, sample_map, input, kernel_size, interpolation);
 
-    at::Tensor grad_bias = grad_output.sum({0, 2, 3});
+    torch::Tensor grad_bias = grad_output.sum({0, 2, 3});
 
     return {grad_input, grad_weight, grad_bias};
   } else
@@ -121,14 +128,14 @@ std::vector<at::Tensor> MappedTransposedConvBackward(
     CHECK_CPU(weight);
     CHECK_CPU(bias);
 
-    at::Tensor grad_input = cpu::MappedTransposedConvBackwardInput(
+    torch::Tensor grad_input = cpu::MappedTransposedConvBackwardInput(
         grad_output, sample_map, weight, input.size(2), input.size(3),
         kernel_size, interpolation);
 
-    at::Tensor grad_weight = cpu::MappedTransposedConvBackwardWeight(
+    torch::Tensor grad_weight = cpu::MappedTransposedConvBackwardWeight(
         grad_output, sample_map, input, kernel_size, interpolation);
 
-    at::Tensor grad_bias = grad_output.sum({0, 2, 3});
+    torch::Tensor grad_bias = grad_output.sum({0, 2, 3});
 
     return {grad_input, grad_weight, grad_bias};
   }

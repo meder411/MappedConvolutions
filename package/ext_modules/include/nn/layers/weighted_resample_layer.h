@@ -12,27 +12,31 @@ namespace nn {
 #ifndef __NO_CUDA__  // CUDA compilation only
 namespace cuda {
 
-at::Tensor WeightedResampleToMap(at::Tensor input, at::Tensor sample_map,
-                                 at::Tensor interp_weights, int outputHeight,
-                                 int outputWidth, int interpolation);
+torch::Tensor WeightedResampleToMap(torch::Tensor input,
+                                    torch::Tensor sample_map,
+                                    torch::Tensor interp_weights,
+                                    int outputHeight, int outputWidth,
+                                    int interpolation);
 
-at::Tensor WeightedResampleFromMap(at::Tensor grad_output,
-                                   at::Tensor sample_map,
-                                   at::Tensor interp_weights,
-                                   int interpolation);
+torch::Tensor WeightedResampleFromMap(torch::Tensor grad_output,
+                                      torch::Tensor sample_map,
+                                      torch::Tensor interp_weights,
+                                      int interpolation);
 }  // namespace cuda
 #endif
 
 namespace cpu {
 
-at::Tensor WeightedResampleToMap(at::Tensor input, at::Tensor sample_map,
-                                 at::Tensor interp_weights, int outputHeight,
-                                 int outputWidth, int interpolation);
+torch::Tensor WeightedResampleToMap(torch::Tensor input,
+                                    torch::Tensor sample_map,
+                                    torch::Tensor interp_weights,
+                                    int outputHeight, int outputWidth,
+                                    int interpolation);
 
-at::Tensor WeightedResampleFromMap(at::Tensor grad_output,
-                                   at::Tensor sample_map,
-                                   at::Tensor interp_weights,
-                                   int interpolation);
+torch::Tensor WeightedResampleFromMap(torch::Tensor grad_output,
+                                      torch::Tensor sample_map,
+                                      torch::Tensor interp_weights,
+                                      int interpolation);
 
 }  // namespace cpu
 
@@ -42,9 +46,11 @@ at::Tensor WeightedResampleFromMap(at::Tensor grad_output,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-at::Tensor WeightedResampleToMap(at::Tensor input, at::Tensor sample_map,
-                                 at::Tensor interp_weights, int outputHeight,
-                                 int outputWidth, int interpolation) {
+torch::Tensor WeightedResampleToMap(torch::Tensor input,
+                                    torch::Tensor sample_map,
+                                    torch::Tensor interp_weights,
+                                    int outputHeight, int outputWidth,
+                                    int interpolation) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(sample_map);
   CHECK_CONTIGUOUS(interp_weights);
@@ -69,10 +75,10 @@ at::Tensor WeightedResampleToMap(at::Tensor input, at::Tensor sample_map,
   }
 }
 
-at::Tensor WeightedResampleFromMap(at::Tensor grad_output,
-                                   at::Tensor sample_map,
-                                   at::Tensor interp_weights,
-                                   int interpolation) {
+torch::Tensor WeightedResampleFromMap(torch::Tensor grad_output,
+                                      torch::Tensor sample_map,
+                                      torch::Tensor interp_weights,
+                                      int interpolation) {
   CHECK_CONTIGUOUS(grad_output);
   CHECK_CONTIGUOUS(sample_map);
   CHECK_CONTIGUOUS(interp_weights);

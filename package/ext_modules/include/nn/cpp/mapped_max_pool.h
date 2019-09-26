@@ -1,9 +1,9 @@
 #ifndef MAPPED_MAX_POOL_H_
 #define MAPPED_MAX_POOL_H_
 
-#include <ATen/ATen.h>
 #include <math.h>
 #include <omp.h>
+#include <torch/extension.h>
 #include <limits>
 
 #include "core/resample.h"
@@ -14,13 +14,13 @@ namespace nn {
 namespace cpu {
 
 template <typename T>
-void MappedMaxPool2D(const int num_kernels, at::Tensor in_data,
-                     at::Tensor sample_map,  // OH x OW x K x 2
+void MappedMaxPool2D(const int num_kernels, torch::Tensor in_data,
+                     torch::Tensor sample_map,  // OH x OW x K x 2
                      const int channels, const int in_height,
                      const int in_width, const int out_height,
                      const int out_width, const int kernel_size,
-                     const int interpolation, at::Tensor out_data,
-                     at::Tensor out_idx)  // Indices of kernel sample in map
+                     const int interpolation, torch::Tensor out_data,
+                     torch::Tensor out_idx)  // Indices of kernel sample in map
 {
   const T *in_data_ptr    = in_data.data<T>();
   const T *sample_map_ptr = sample_map.data<T>();
@@ -38,12 +38,12 @@ void MappedMaxPool2D(const int num_kernels, at::Tensor in_data,
 }
 
 template <typename T>
-void MappedMaxUnpool2D(const int num_kernels, at::Tensor grad_output,
-                       at::Tensor idx_mask, at::Tensor sample_map,
+void MappedMaxUnpool2D(const int num_kernels, torch::Tensor grad_output,
+                       torch::Tensor idx_mask, torch::Tensor sample_map,
                        const int channels, const int orig_height,
                        const int orig_width, const int pooled_height,
                        const int pooled_width, const int kernel_size,
-                       const int interpolation, at::Tensor grad_input) {
+                       const int interpolation, torch::Tensor grad_input) {
   const T *grad_output_ptr    = grad_output.data<T>();
   const int64_t *idx_mask_ptr = idx_mask.data<int64_t>();
   const T *sample_map_ptr     = sample_map.data<T>();
@@ -65,13 +65,13 @@ void MappedMaxUnpool2D(const int num_kernels, at::Tensor grad_output,
 
 template <typename T>
 void MappedMaxPool2DWeighted(
-    const int num_kernels, at::Tensor in_data,
-    at::Tensor sample_map,      // OH x OW x K x P x 2
-    at::Tensor interp_weights,  // OH x OW x K x P
+    const int num_kernels, torch::Tensor in_data,
+    torch::Tensor sample_map,      // OH x OW x K x P x 2
+    torch::Tensor interp_weights,  // OH x OW x K x P
     const int channels, const int in_height, const int in_width,
     const int out_height, const int out_width, const int kernel_size,
-    const int interpolation, const int num_interp_pts, at::Tensor out_data,
-    at::Tensor out_idx)  // Indices of kernel sample in map
+    const int interpolation, const int num_interp_pts, torch::Tensor out_data,
+    torch::Tensor out_idx)  // Indices of kernel sample in map
 {
   const T *in_data_ptr        = in_data.data<T>();
   const T *sample_map_ptr     = sample_map.data<T>();
@@ -91,14 +91,12 @@ void MappedMaxPool2DWeighted(
 }
 
 template <typename T>
-void MappedMaxUnpool2DWeighted(const int num_kernels, at::Tensor grad_output,
-                               at::Tensor idx_mask, at::Tensor sample_map,
-                               at::Tensor interp_weights, const int channels,
-                               const int orig_height, const int orig_width,
-                               const int pooled_height, const int pooled_width,
-                               const int kernel_size, const int interpolation,
-                               const int num_interp_pts,
-                               at::Tensor grad_input) {
+void MappedMaxUnpool2DWeighted(
+    const int num_kernels, torch::Tensor grad_output, torch::Tensor idx_mask,
+    torch::Tensor sample_map, torch::Tensor interp_weights, const int channels,
+    const int orig_height, const int orig_width, const int pooled_height,
+    const int pooled_width, const int kernel_size, const int interpolation,
+    const int num_interp_pts, torch::Tensor grad_input) {
   const T *grad_output_ptr    = grad_output.data<T>();
   const int64_t *idx_mask_ptr = idx_mask.data<int64_t>();
   const T *sample_map_ptr     = sample_map.data<T>();

@@ -1,8 +1,8 @@
 #ifndef VOTING_RESAMPLE_TO_SHERE_LAYER_CUH_
 #define VOTING_RESAMPLE_TO_SHERE_LAYER_CUH_
 
-#include <ATen/ATen.h>
 #include <math.h>
+#include <torch/extension.h>
 
 #include "cuda_helper.h"
 
@@ -52,16 +52,16 @@ __global__ void ResampleToSphereWithVotingKernel(
 }
 
 void ResampleToSphereWithVotingLauncher(
-    at::Tensor data_in,
-    at::Tensor sample_map,  // IH, IW, 2
+    torch::Tensor data_in,
+    torch::Tensor sample_map,  // IH, IW, 2
     const int64_t channels, const int64_t in_height, const int64_t in_width,
     const int64_t out_height, const int64_t out_width,
-    const int64_t num_options, at::Tensor votes) {
+    const int64_t num_options, torch::Tensor votes) {
   const int64_t num_kernels = channels * in_height * in_width;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
   AT_DISPATCH_FLOATING_TYPES(
-      sample_map.type(), "ResampleToSphereWithVotingKernel", ([&] {
+      sample_map.scalar_type(), "ResampleToSphereWithVotingKernel", ([&] {
         ResampleToSphereWithVotingKernel<scalar_t>
             <<<blocks, CUDA_NUM_THREADS>>>(
                 num_kernels, data_in.data<int64_t>(),

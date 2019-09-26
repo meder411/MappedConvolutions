@@ -11,28 +11,30 @@ namespace nn {
 
 #ifndef __NO_CUDA__  // CUDA compilation only
 namespace cuda {
-std::vector<at::Tensor> MappedMaxPoolForward(at::Tensor input,
-                                             at::Tensor sample_map,
-                                             int kernel_size,
-                                             int interpolation);
+std::vector<torch::Tensor> MappedMaxPoolForward(torch::Tensor input,
+                                                torch::Tensor sample_map,
+                                                int kernel_size,
+                                                int interpolation);
 
-at::Tensor MappedMaxPoolBackward(at::Tensor input, at::Tensor idx_mask,
-                                 at::Tensor sample_map, int inputHeight,
-                                 int inputWidth, int kernel_size,
-                                 int interpolation);
+torch::Tensor MappedMaxPoolBackward(torch::Tensor input,
+                                    torch::Tensor idx_mask,
+                                    torch::Tensor sample_map, int inputHeight,
+                                    int inputWidth, int kernel_size,
+                                    int interpolation);
 }  // namespace cuda
 #endif
 
 namespace cpu {
-std::vector<at::Tensor> MappedMaxPoolForward(at::Tensor input,
-                                             at::Tensor sample_map,
-                                             int kernel_size,
-                                             int interpolation);
+std::vector<torch::Tensor> MappedMaxPoolForward(torch::Tensor input,
+                                                torch::Tensor sample_map,
+                                                int kernel_size,
+                                                int interpolation);
 
-at::Tensor MappedMaxPoolBackward(at::Tensor input, at::Tensor idx_mask,
-                                 at::Tensor sample_map, int inputHeight,
-                                 int inputWidth, int kernel_size,
-                                 int interpolation);
+torch::Tensor MappedMaxPoolBackward(torch::Tensor input,
+                                    torch::Tensor idx_mask,
+                                    torch::Tensor sample_map, int inputHeight,
+                                    int inputWidth, int kernel_size,
+                                    int interpolation);
 }  // namespace cpu
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -41,10 +43,10 @@ at::Tensor MappedMaxPoolBackward(at::Tensor input, at::Tensor idx_mask,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-std::vector<at::Tensor> MappedMaxPoolForward(at::Tensor input,
-                                             at::Tensor sample_map,
-                                             int kernel_size,
-                                             int interpolation) {
+std::vector<torch::Tensor> MappedMaxPoolForward(torch::Tensor input,
+                                                torch::Tensor sample_map,
+                                                int kernel_size,
+                                                int interpolation) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(sample_map);
 
@@ -64,10 +66,11 @@ std::vector<at::Tensor> MappedMaxPoolForward(at::Tensor input,
   }
 }
 
-at::Tensor MappedMaxPoolBackward(at::Tensor input, at::Tensor idx_mask,
-                                 at::Tensor sample_map, int inputHeight,
-                                 int inputWidth, int kernel_size,
-                                 int interpolation) {
+torch::Tensor MappedMaxPoolBackward(torch::Tensor input,
+                                    torch::Tensor idx_mask,
+                                    torch::Tensor sample_map, int inputHeight,
+                                    int inputWidth, int kernel_size,
+                                    int interpolation) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(idx_mask);
   CHECK_CONTIGUOUS(sample_map);

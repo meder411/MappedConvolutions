@@ -1,4 +1,4 @@
-#include <ATen/ATen.h>
+#include <torch/extension.h>
 
 #include <vector>
 
@@ -8,11 +8,9 @@ namespace mapped_conv {
 namespace nn {
 namespace cuda {
 
-std::vector<at::Tensor> WeightedMappedMaxPoolForward(at::Tensor input,
-                                                     at::Tensor sample_map,
-                                                     at::Tensor interp_weights,
-                                                     int kernel_size,
-                                                     int interpolation) {
+std::vector<torch::Tensor> WeightedMappedMaxPoolForward(
+    torch::Tensor input, torch::Tensor sample_map,
+    torch::Tensor interp_weights, int kernel_size, int interpolation) {
   // Useful dimensions to have
   const int64_t batchSize      = input.size(0);
   const int64_t channels       = input.size(1);
@@ -23,11 +21,11 @@ std::vector<at::Tensor> WeightedMappedMaxPoolForward(at::Tensor input,
   const int64_t num_interp_pts = interp_weights.size(3);
 
   // Initialize output and index mask
-  at::Tensor output = at::zeros(
+  torch::Tensor output = torch::zeros(
       {batchSize, channels, outputHeight, outputWidth}, input.options());
-  at::Tensor indices =
-      at::zeros({batchSize, channels, outputHeight, outputWidth},
-                input.options().dtype(at::kLong));
+  torch::Tensor indices =
+      torch::zeros({batchSize, channels, outputHeight, outputWidth},
+                   input.options().dtype(torch::kLong));
 
   // Call the CUDA kernel once per batch
   for (int b = 0; b < batchSize; b++) {
@@ -40,12 +38,10 @@ std::vector<at::Tensor> WeightedMappedMaxPoolForward(at::Tensor input,
   return {output, indices};
 }
 
-at::Tensor WeightedMappedMaxPoolBackward(at::Tensor grad_output,
-                                         at::Tensor idx_mask,
-                                         at::Tensor sample_map,
-                                         at::Tensor interp_weights,
-                                         int inputHeight, int inputWidth,
-                                         int kernel_size, int interpolation) {
+torch::Tensor WeightedMappedMaxPoolBackward(
+    torch::Tensor grad_output, torch::Tensor idx_mask,
+    torch::Tensor sample_map, torch::Tensor interp_weights, int inputHeight,
+    int inputWidth, int kernel_size, int interpolation) {
   // Useful dimensions to have
   const int64_t batchSize      = grad_output.size(0);
   const int64_t channels       = grad_output.size(1);
@@ -54,7 +50,7 @@ at::Tensor WeightedMappedMaxPoolBackward(at::Tensor grad_output,
   const int64_t num_interp_pts = interp_weights.size(3);
 
   // Initialize output and index mask
-  at::Tensor grad_input = at::zeros(
+  torch::Tensor grad_input = torch::zeros(
       {batchSize, channels, inputHeight, inputWidth}, grad_output.options());
 
   // Call the CUDA kernel once per batch

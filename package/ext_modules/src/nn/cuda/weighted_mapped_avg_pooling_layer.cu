@@ -1,4 +1,4 @@
-#include <ATen/ATen.h>
+#include <torch/extension.h>
 
 #include <vector>
 
@@ -8,10 +8,11 @@ namespace mapped_conv {
 namespace nn {
 namespace cuda {
 
-at::Tensor WeightedMappedAvgPoolForward(at::Tensor input,
-                                        at::Tensor sample_map,
-                                        at::Tensor interp_weights,
-                                        int kernel_size, int interpolation) {
+torch::Tensor WeightedMappedAvgPoolForward(torch::Tensor input,
+                                           torch::Tensor sample_map,
+                                           torch::Tensor interp_weights,
+                                           int kernel_size,
+                                           int interpolation) {
   // Useful dimensions to have
   const int64_t batchSize      = input.size(0);
   const int64_t channels       = input.size(1);
@@ -22,7 +23,7 @@ at::Tensor WeightedMappedAvgPoolForward(at::Tensor input,
   const int64_t num_interp_pts = interp_weights.size(3);
 
   // Initialize output and index mask
-  at::Tensor output = at::zeros(
+  torch::Tensor output = torch::zeros(
       {batchSize, channels, outputHeight, outputWidth}, input.options());
 
   // Call the CUDA kernel once per batch
@@ -36,11 +37,12 @@ at::Tensor WeightedMappedAvgPoolForward(at::Tensor input,
   return output;
 }
 
-at::Tensor WeightedMappedAvgPoolBackward(at::Tensor grad_output,
-                                         at::Tensor sample_map,
-                                         at::Tensor interp_weights,
-                                         int inputHeight, int inputWidth,
-                                         int kernel_size, int interpolation) {
+torch::Tensor WeightedMappedAvgPoolBackward(torch::Tensor grad_output,
+                                            torch::Tensor sample_map,
+                                            torch::Tensor interp_weights,
+                                            int inputHeight, int inputWidth,
+                                            int kernel_size,
+                                            int interpolation) {
   // Useful dimensions to have
   const int64_t batchSize      = grad_output.size(0);
   const int64_t channels       = grad_output.size(1);
@@ -49,7 +51,7 @@ at::Tensor WeightedMappedAvgPoolBackward(at::Tensor grad_output,
   const int64_t num_interp_pts = interp_weights.size(3);
 
   // Initialize output and index mask
-  at::Tensor grad_input = at::zeros(
+  torch::Tensor grad_input = torch::zeros(
       {batchSize, channels, inputHeight, inputWidth}, grad_output.options());
 
   // Call the CUDA kernel once per batch

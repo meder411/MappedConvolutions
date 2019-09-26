@@ -11,11 +11,11 @@ namespace util {
 
 #ifndef __NO_CUDA__
 namespace cuda {
-std::vector<at::Tensor> ResampleToSphereWithVoting(at::Tensor input,
-                                                   at::Tensor sample_map,
-                                                   int outputHeight,
-                                                   int outputWidth,
-                                                   int num_options);
+std::vector<torch::Tensor> ResampleToSphereWithVoting(torch::Tensor input,
+                                                      torch::Tensor sample_map,
+                                                      int outputHeight,
+                                                      int outputWidth,
+                                                      int num_options);
 }  // namespace cuda
 #endif
 
@@ -25,11 +25,11 @@ std::vector<at::Tensor> ResampleToSphereWithVoting(at::Tensor input,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-std::vector<at::Tensor> ResampleToSphereWithVoting(at::Tensor input,
-                                                   at::Tensor sample_map,
-                                                   int outputHeight,
-                                                   int outputWidth,
-                                                   int num_options) {
+std::vector<torch::Tensor> ResampleToSphereWithVoting(torch::Tensor input,
+                                                      torch::Tensor sample_map,
+                                                      int outputHeight,
+                                                      int outputWidth,
+                                                      int num_options) {
 #ifndef __NO_CUDA__
   CHECK_INPUT(input);
   CHECK_INPUT(sample_map);

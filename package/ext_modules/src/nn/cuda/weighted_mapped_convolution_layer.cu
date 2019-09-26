@@ -1,5 +1,5 @@
-#include <ATen/ATen.h>
 #include <ATen/cuda/CUDAContext.h>
+#include <torch/extension.h>
 
 #include <cublas_v2.h>
 #include <cuda.h>
@@ -13,11 +13,10 @@ namespace mapped_conv {
 namespace nn {
 namespace cuda {
 
-at::Tensor WeightedMappedConvForward(at::Tensor input, at::Tensor sample_map,
-                                     at::Tensor interp_weights,
-                                     at::Tensor weight, at::Tensor bias,
-                                     int64_t kernel_size,
-                                     int64_t interpolation) {
+torch::Tensor WeightedMappedConvForward(
+    torch::Tensor input, torch::Tensor sample_map,
+    torch::Tensor interp_weights, torch::Tensor weight, torch::Tensor bias,
+    int64_t kernel_size, int64_t interpolation) {
   // Useful dimensions to have
   const int64_t nOutputPlanes  = weight.size(0);
   const int64_t nInputPlanes   = weight.size(1);
@@ -29,13 +28,13 @@ at::Tensor WeightedMappedConvForward(at::Tensor input, at::Tensor sample_map,
   const int64_t batchSize      = input.size(0);
 
   // Initialize output and temporary columns
-  at::Tensor output =
-      at::zeros({batchSize, nOutputPlanes, outputHeight, outputWidth},
-                input.options()) +
+  torch::Tensor output =
+      torch::zeros({batchSize, nOutputPlanes, outputHeight, outputWidth},
+                   input.options()) +
       10;
-  at::Tensor columns =
-      at::zeros({kernel_size * nInputPlanes, outputHeight * outputWidth},
-                input.options());
+  torch::Tensor columns =
+      torch::zeros({kernel_size * nInputPlanes, outputHeight * outputWidth},
+                   input.options());
 
   // For each elt in batch, do:
   const int64_t outputBatchStride = nOutputPlanes * outputHeight * outputWidth;
@@ -54,13 +53,13 @@ at::Tensor WeightedMappedConvForward(at::Tensor input, at::Tensor sample_map,
     const int64_t m = columns.size(1);
     const int64_t k = weight.size(1) * weight.size(2);
     const int64_t n = weight.size(0);
-    if (input.dtype() == at::kDouble) {
+    if (input.dtype() == torch::kDouble) {
       const double alpha = 1.0;
       const double beta  = 0.0;
       cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
                   columns.data<double>(), m, weight.data<double>(), k, &beta,
                   output.data<double>() + b * outputBatchStride, m);
-    } else if (input.dtype() == at::kFloat) {
+    } else if (input.dtype() == torch::kFloat) {
       const float alpha = 1.0;
       const float beta  = 0.0;
       cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
@@ -76,10 +75,10 @@ at::Tensor WeightedMappedConvForward(at::Tensor input, at::Tensor sample_map,
   return output;
 }
 
-at::Tensor WeightedMappedConvBackwardInput(
-    at::Tensor grad_output, at::Tensor sample_map, at::Tensor interp_weights,
-    at::Tensor weight, int64_t inputHeight, int64_t inputWidth,
-    int64_t kernel_size, int64_t interpolation) {
+torch::Tensor WeightedMappedConvBackwardInput(
+    torch::Tensor grad_output, torch::Tensor sample_map,
+    torch::Tensor interp_weights, torch::Tensor weight, int64_t inputHeight,
+    int64_t inputWidth, int64_t kernel_size, int64_t interpolation) {
   // Useful dimensions to have
   const int64_t nOutputPlanes  = weight.size(0);
   const int64_t nInputPlanes   = weight.size(1);
@@ -89,12 +88,12 @@ at::Tensor WeightedMappedConvBackwardInput(
   const int64_t batchSize      = grad_output.size(0);
 
   // Initialize output and temporary columns
-  at::Tensor input_grad =
-      at::zeros({batchSize, nInputPlanes, inputHeight, inputWidth},
-                grad_output.options());
-  at::Tensor columns =
-      at::zeros({kernel_size * nInputPlanes, outputHeight * outputWidth},
-                grad_output.options());
+  torch::Tensor input_grad =
+      torch::zeros({batchSize, nInputPlanes, inputHeight, inputWidth},
+                   grad_output.options());
+  torch::Tensor columns =
+      torch::zeros({kernel_size * nInputPlanes, outputHeight * outputWidth},
+                   grad_output.options());
 
   // For each elt in batch, do:
   const int64_t outputBatchStride = nOutputPlanes * outputHeight * outputWidth;
@@ -107,7 +106,7 @@ at::Tensor WeightedMappedConvBackwardInput(
     const int64_t m = columns.size(1);
     const int64_t n = weight.size(1) * weight.size(2);
     const int64_t k = weight.size(0);
-    if (grad_output.dtype() == at::kDouble) {
+    if (grad_output.dtype() == torch::kDouble) {
       const double alpha = 1.0;
       const double beta  = 0.0;
       cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_T, m, n, k, &alpha,
@@ -115,7 +114,7 @@ at::Tensor WeightedMappedConvBackwardInput(
                   m,                                  // lda=N
                   weight.data<double>(), n,           // ldb=ck^2
                   &beta, columns.data<double>(), m);  // ldc=N
-    } else if (grad_output.dtype() == at::kFloat) {
+    } else if (grad_output.dtype() == torch::kFloat) {
       const float alpha = 1.0;
       const float beta  = 0.0;
       cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_T, m, n, k, &alpha,
@@ -135,9 +134,12 @@ at::Tensor WeightedMappedConvBackwardInput(
   return input_grad;
 }
 
-at::Tensor WeightedMappedConvBackwardWeight(
-    at::Tensor grad_output, at::Tensor sample_map, at::Tensor interp_weights,
-    at::Tensor input, int64_t kernel_size, int64_t interpolation) {
+torch::Tensor WeightedMappedConvBackwardWeight(torch::Tensor grad_output,
+                                               torch::Tensor sample_map,
+                                               torch::Tensor interp_weights,
+                                               torch::Tensor input,
+                                               int64_t kernel_size,
+                                               int64_t interpolation) {
   // Useful dimensions to have
   const int64_t nOutputPlanes  = grad_output.size(1);
   const int64_t nInputPlanes   = input.size(1);
@@ -149,11 +151,11 @@ at::Tensor WeightedMappedConvBackwardWeight(
   const int64_t batchSize      = grad_output.size(0);
 
   // Initialize output and temporary columns
-  at::Tensor weight_grad = at::zeros(
+  torch::Tensor weight_grad = torch::zeros(
       {nOutputPlanes, nInputPlanes, kernel_size}, grad_output.options());
-  at::Tensor columns =
-      at::zeros({kernel_size * nInputPlanes, outputHeight * outputWidth},
-                grad_output.options());
+  torch::Tensor columns =
+      torch::zeros({kernel_size * nInputPlanes, outputHeight * outputWidth},
+                   grad_output.options());
 
   // For each elt in batch, do:
   const int64_t outputBatchStride = nOutputPlanes * outputHeight * outputWidth;
@@ -174,7 +176,7 @@ at::Tensor WeightedMappedConvBackwardWeight(
     const int64_t m = weight_grad.size(1) * weight_grad.size(2);
     const int64_t n = weight_grad.size(0);
     const int64_t k = columns.size(1);
-    if (grad_output.dtype() == at::kDouble) {
+    if (grad_output.dtype() == torch::kDouble) {
       const double alpha = 1.0;
       const double beta  = 1.0;
       cublasDgemm(handle, CUBLAS_OP_T, CUBLAS_OP_N, m, n, k, &alpha,
@@ -182,7 +184,7 @@ at::Tensor WeightedMappedConvBackwardWeight(
                   grad_output.data<double>() + b * outputBatchStride, k, &beta,
                   weight_grad.data<double>(), m);
     }
-    if (grad_output.dtype() == at::kFloat) {
+    if (grad_output.dtype() == torch::kFloat) {
       const float alpha = 1.0;
       const float beta  = 1.0;
       cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_N, m, n, k, &alpha,

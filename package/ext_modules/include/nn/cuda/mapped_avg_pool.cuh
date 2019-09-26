@@ -1,7 +1,7 @@
 #ifndef MAPPED_AVG_POOL_CUH_
 #define MAPPED_AVG_POOL_CUH_
 
-#include <ATen/ATen.h>
+#include <torch/extension.h>
 
 #include "core/resample.h"
 #include "cuda_helper.h"
@@ -26,18 +26,18 @@ __global__ void MappedAvgPool2DKernel(
                           kernel_size, interpolation, out_data_ptr);
 }
 
-void MappedAvgPool2DLauncher(at::Tensor in_data, at::Tensor sample_map,
+void MappedAvgPool2DLauncher(torch::Tensor in_data, torch::Tensor sample_map,
                              const int channels, const int in_height,
                              const int in_width, const int out_height,
                              const int out_width, const int kernel_size,
-                             const int interpolation, at::Tensor out_data) {
+                             const int interpolation, torch::Tensor out_data) {
   const int num_kernels = channels * out_height * out_width;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
   // To avoid involving atomic operations, we will launch one kernel per
   // bottom dimension, and then in the kernel add up the top dimensions.
   AT_DISPATCH_FLOATING_TYPES(
-      in_data.type(), "MappedAvgPool2DKernel", ([&] {
+      in_data.scalar_type(), "MappedAvgPool2DKernel", ([&] {
         MappedAvgPool2DKernel<scalar_t><<<blocks, CUDA_NUM_THREADS>>>(
             num_kernels, in_data.data<scalar_t>(), sample_map.data<scalar_t>(),
             channels, in_height, in_width, out_height, out_width, kernel_size,
@@ -62,19 +62,19 @@ __global__ void MappedAvgUnpool2DKernel(
                             grad_input_ptr);
 }
 
-void MappedAvgUnpool2DLauncher(at::Tensor grad_output, at::Tensor sample_map,
-                               const int channels, const int orig_height,
-                               const int orig_width, const int pooled_height,
-                               const int pooled_width, const int kernel_size,
-                               const int interpolation,
-                               at::Tensor grad_input) {
+void MappedAvgUnpool2DLauncher(torch::Tensor grad_output,
+                               torch::Tensor sample_map, const int channels,
+                               const int orig_height, const int orig_width,
+                               const int pooled_height, const int pooled_width,
+                               const int kernel_size, const int interpolation,
+                               torch::Tensor grad_input) {
   const int num_kernels = channels * pooled_height * pooled_width;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
   // To avoid involving atomic operations, we will launch one kernel per
   // bottom dimension, and then in the kernel add up the top dimensions.
   AT_DISPATCH_FLOATING_TYPES(
-      grad_output.type(), "MappedAvgUnpool2DLauncher", ([&] {
+      grad_output.scalar_type(), "MappedAvgUnpool2DLauncher", ([&] {
         MappedAvgUnpool2DKernel<scalar_t><<<blocks, CUDA_NUM_THREADS>>>(
             num_kernels, grad_output.data<scalar_t>(),
             sample_map.data<scalar_t>(), channels, orig_height, orig_width,
@@ -106,17 +106,18 @@ __global__ void MappedAvgPool2DWeightedKernel(
 }
 
 void MappedAvgPool2DWeightedLauncher(
-    at::Tensor in_data, at::Tensor sample_map, at::Tensor interp_weights,
-    const int channels, const int in_height, const int in_width,
-    const int out_height, const int out_width, const int kernel_size,
-    const int interpolation, const int num_interp_pts, at::Tensor out_data) {
+    torch::Tensor in_data, torch::Tensor sample_map,
+    torch::Tensor interp_weights, const int channels, const int in_height,
+    const int in_width, const int out_height, const int out_width,
+    const int kernel_size, const int interpolation, const int num_interp_pts,
+    torch::Tensor out_data) {
   const int num_kernels = channels * out_height * out_width;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
   // To avoid involving atomic operations, we will launch one kernel per
   // bottom dimension, and then in the kernel add up the top dimensions.
   AT_DISPATCH_FLOATING_TYPES(
-      in_data.type(), "MappedAvgPool2DWeightedLauncher", ([&] {
+      in_data.scalar_type(), "MappedAvgPool2DWeightedLauncher", ([&] {
         MappedAvgPool2DWeightedKernel<scalar_t><<<blocks, CUDA_NUM_THREADS>>>(
             num_kernels, in_data.data<scalar_t>(), sample_map.data<scalar_t>(),
             interp_weights.data<scalar_t>(), channels, in_height, in_width,
@@ -144,17 +145,18 @@ __global__ void MappedAvgUnpool2DWeightedKernel(
 }
 
 void MappedAvgUnpool2DWeightedLauncher(
-    at::Tensor grad_output, at::Tensor sample_map, at::Tensor interp_weights,
-    const int channels, const int orig_height, const int orig_width,
-    const int pooled_height, const int pooled_width, const int kernel_size,
-    const int interpolation, const int num_interp_pts, at::Tensor grad_input) {
+    torch::Tensor grad_output, torch::Tensor sample_map,
+    torch::Tensor interp_weights, const int channels, const int orig_height,
+    const int orig_width, const int pooled_height, const int pooled_width,
+    const int kernel_size, const int interpolation, const int num_interp_pts,
+    torch::Tensor grad_input) {
   const int num_kernels = channels * pooled_height * pooled_width;
   const dim3 blocks((num_kernels + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS);
 
   // To avoid involving atomic operations, we will launch one kernel per
   // bottom dimension, and then in the kernel add up the top dimensions.
   AT_DISPATCH_FLOATING_TYPES(
-      grad_output.type(), "MappedAvgUnpool2DWeightedLauncher", ([&] {
+      grad_output.scalar_type(), "MappedAvgUnpool2DWeightedLauncher", ([&] {
         MappedAvgUnpool2DWeightedKernel<scalar_t>
             <<<blocks, CUDA_NUM_THREADS>>>(
                 num_kernels, grad_output.data<scalar_t>(),

@@ -1,7 +1,7 @@
 #ifndef CORE_INTERPOLATION_H_
 #define CORE_INTERPOLATION_H_
 
-#include <ATen/ATen.h>
+#include <torch/extension.h>
 
 #include <math.h>
 #include <omp.h>

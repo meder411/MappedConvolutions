@@ -1,4 +1,4 @@
-#include <ATen/ATen.h>
+#include <torch/extension.h>
 
 #include <vector>
 
@@ -8,9 +8,10 @@ namespace mapped_conv {
 namespace util {
 namespace cuda {
 
-at::Tensor ResampleToSphereWithVoting(at::Tensor input, at::Tensor sample_map,
-                                      int outputHeight, int outputWidth,
-                                      int num_options) {
+torch::Tensor ResampleToSphereWithVoting(torch::Tensor input,
+                                         torch::Tensor sample_map,
+                                         int outputHeight, int outputWidth,
+                                         int num_options) {
   // Useful dimensions to have
   const int64_t batchSize   = input.size(0);
   const int64_t channels    = input.size(1);
@@ -18,9 +19,9 @@ at::Tensor ResampleToSphereWithVoting(at::Tensor input, at::Tensor sample_map,
   const int64_t inputWidth  = input.size(3);
 
   // Initialize output and index mask
-  at::Tensor output = at::zeros(
+  torch::Tensor output = torch::zeros(
       {batchSize, channels, outputHeight, outputWidth}, input.options());
-  at::Tensor votes = at::zeros(
+  torch::Tensor votes = torch::zeros(
       {channels, outputHeight, outputWidth, num_options}, input.options());
 
   // Call the CUDA kernel once per batch

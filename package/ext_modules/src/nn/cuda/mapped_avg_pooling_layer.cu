@@ -1,4 +1,4 @@
-#include <ATen/ATen.h>
+#include <torch/extension.h>
 
 #include <vector>
 
@@ -8,8 +8,9 @@ namespace mapped_conv {
 namespace nn {
 namespace cuda {
 
-at::Tensor MappedAvgPoolForward(at::Tensor input, at::Tensor sample_map,
-                                int kernel_size, int interpolation) {
+torch::Tensor MappedAvgPoolForward(torch::Tensor input,
+                                   torch::Tensor sample_map, int kernel_size,
+                                   int interpolation) {
   // Useful dimensions to have
   const int64_t batchSize    = input.size(0);
   const int64_t channels     = input.size(1);
@@ -19,7 +20,7 @@ at::Tensor MappedAvgPoolForward(at::Tensor input, at::Tensor sample_map,
   const int64_t outputWidth  = sample_map.size(1);
 
   // Initialize output and index mask
-  at::Tensor output = at::zeros(
+  torch::Tensor output = torch::zeros(
       {batchSize, channels, outputHeight, outputWidth}, input.options());
 
   // Call the CUDA kernel once per batch
@@ -32,9 +33,10 @@ at::Tensor MappedAvgPoolForward(at::Tensor input, at::Tensor sample_map,
   return output;
 }
 
-at::Tensor MappedAvgPoolBackward(at::Tensor grad_output, at::Tensor sample_map,
-                                 int inputHeight, int inputWidth,
-                                 int kernel_size, int interpolation) {
+torch::Tensor MappedAvgPoolBackward(torch::Tensor grad_output,
+                                    torch::Tensor sample_map, int inputHeight,
+                                    int inputWidth, int kernel_size,
+                                    int interpolation) {
   // Useful dimensions to have
   const int64_t batchSize    = grad_output.size(0);
   const int64_t channels     = grad_output.size(1);
@@ -42,7 +44,7 @@ at::Tensor MappedAvgPoolBackward(at::Tensor grad_output, at::Tensor sample_map,
   const int64_t outputWidth  = grad_output.size(3);
 
   // Initialize output and index mask
-  at::Tensor grad_input = at::zeros(
+  torch::Tensor grad_input = torch::zeros(
       {batchSize, channels, inputHeight, inputWidth}, grad_output.options());
 
   // Call the CUDA kernel once per batch

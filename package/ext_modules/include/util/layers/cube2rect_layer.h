@@ -12,10 +12,10 @@ namespace util {
 #ifndef __NO_CUDA__
 namespace cuda {
 
-at::Tensor Cube2RectForward(at::Tensor cubemap,  // [-z, -x, +z, +x, +y, -y]
-                            const int64_t rect_height,
-                            const int64_t rect_width,
-                            const int64_t interpolation);
+torch::Tensor Cube2RectForward(
+    torch::Tensor cubemap,  // [-z, -x, +z, +x, +y, -y]
+    const int64_t rect_height, const int64_t rect_width,
+    const int64_t interpolation);
 
 }  // namespace cuda
 #endif
@@ -26,10 +26,10 @@ at::Tensor Cube2RectForward(at::Tensor cubemap,  // [-z, -x, +z, +x, +y, -y]
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-at::Tensor Cube2RectForward(at::Tensor cubemap,  // [-z, -x, +z, +x, +y, -y]
-                            const int64_t rect_height,
-                            const int64_t rect_width,
-                            const int64_t interpolation) {
+torch::Tensor Cube2RectForward(
+    torch::Tensor cubemap,  // [-z, -x, +z, +x, +y, -y]
+    const int64_t rect_height, const int64_t rect_width,
+    const int64_t interpolation) {
 #ifndef __NO_CUDA__
   CHECK_CONTIGUOUS(cubemap);
   CHECK_CUDA(cubemap);

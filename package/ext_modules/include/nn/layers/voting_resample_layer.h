@@ -12,17 +12,17 @@ namespace nn {
 #ifndef __NO_CUDA__  // CUDA compilation only
 namespace cuda {
 
-at::Tensor VotingResampleToMap(at::Tensor input, at::Tensor sample_map,
-                               int outputHeight, int outputWidth,
-                               int numCandidates);
+torch::Tensor VotingResampleToMap(torch::Tensor input,
+                                  torch::Tensor sample_map, int outputHeight,
+                                  int outputWidth, int numCandidates);
 }  // namespace cuda
 #endif
 
 namespace cpu {
 
-at::Tensor VotingResampleToMap(at::Tensor input, at::Tensor sample_map,
-                               int outputHeight, int outputWidth,
-                               int numCandidates);
+torch::Tensor VotingResampleToMap(torch::Tensor input,
+                                  torch::Tensor sample_map, int outputHeight,
+                                  int outputWidth, int numCandidates);
 }  // namespace cpu
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -31,9 +31,9 @@ at::Tensor VotingResampleToMap(at::Tensor input, at::Tensor sample_map,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-at::Tensor VotingResampleToMap(at::Tensor input, at::Tensor sample_map,
-                               int outputHeight, int outputWidth,
-                               int numCandidates) {
+torch::Tensor VotingResampleToMap(torch::Tensor input,
+                                  torch::Tensor sample_map, int outputHeight,
+                                  int outputWidth, int numCandidates) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(sample_map);
 

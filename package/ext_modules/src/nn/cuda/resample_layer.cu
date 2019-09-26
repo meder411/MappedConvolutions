@@ -1,4 +1,4 @@
-#include <ATen/ATen.h>
+#include <torch/extension.h>
 
 #include "nn/cuda/resample.cuh"
 
@@ -6,9 +6,9 @@ namespace mapped_conv {
 namespace nn {
 namespace cuda {
 
-at::Tensor ResampleToMap(at::Tensor input, at::Tensor output_map,
-                         int outputHeight, int outputWidth,
-                         int interpolation) {
+torch::Tensor ResampleToMap(torch::Tensor input, torch::Tensor output_map,
+                            int outputHeight, int outputWidth,
+                            int interpolation) {
   // Useful dimensions to have
   const int64_t batchSize   = input.size(0);
   const int64_t channels    = input.size(1);
@@ -16,7 +16,7 @@ at::Tensor ResampleToMap(at::Tensor input, at::Tensor output_map,
   const int64_t inputWidth  = input.size(3);
 
   // Initialize output and index mask
-  at::Tensor output = at::zeros(
+  torch::Tensor output = torch::zeros(
       {batchSize, channels, outputHeight, outputWidth}, input.options());
 
   // Call the CUDA kernel once per batch
@@ -29,8 +29,8 @@ at::Tensor ResampleToMap(at::Tensor input, at::Tensor output_map,
   return output;
 }
 
-at::Tensor ResampleFromMap(at::Tensor grad_output, at::Tensor output_map,
-                           int interpolation) {
+torch::Tensor ResampleFromMap(torch::Tensor grad_output,
+                              torch::Tensor output_map, int interpolation) {
   // Useful dimensions to have
   const int64_t batchSize    = grad_output.size(0);
   const int64_t channels     = grad_output.size(1);
@@ -40,8 +40,8 @@ at::Tensor ResampleFromMap(at::Tensor grad_output, at::Tensor output_map,
   const int64_t outputWidth  = grad_output.size(3);
 
   // Initialize output and index mask
-  at::Tensor input = at::zeros({batchSize, channels, inputHeight, inputWidth},
-                               grad_output.options());
+  torch::Tensor input = torch::zeros(
+      {batchSize, channels, inputHeight, inputWidth}, grad_output.options());
 
   // Call the CUDA kernel once per batch
   for (int b = 0; b < batchSize; b++) {

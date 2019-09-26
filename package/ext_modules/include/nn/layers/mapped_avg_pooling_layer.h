@@ -11,22 +11,26 @@ namespace nn {
 
 #ifndef __NO_CUDA__  // CUDA compilation only
 namespace cuda {
-at::Tensor MappedAvgPoolForward(at::Tensor input, at::Tensor sample_map,
-                                int kernel_size, int interpolation);
+torch::Tensor MappedAvgPoolForward(torch::Tensor input,
+                                   torch::Tensor sample_map, int kernel_size,
+                                   int interpolation);
 
-at::Tensor MappedAvgPoolBackward(at::Tensor input, at::Tensor sample_map,
-                                 int inputHeight, int inputWidth,
-                                 int kernel_size, int interpolation);
+torch::Tensor MappedAvgPoolBackward(torch::Tensor input,
+                                    torch::Tensor sample_map, int inputHeight,
+                                    int inputWidth, int kernel_size,
+                                    int interpolation);
 }  // namespace cuda
 #endif
 
 namespace cpu {
-at::Tensor MappedAvgPoolForward(at::Tensor input, at::Tensor sample_map,
-                                int kernel_size, int interpolation);
+torch::Tensor MappedAvgPoolForward(torch::Tensor input,
+                                   torch::Tensor sample_map, int kernel_size,
+                                   int interpolation);
 
-at::Tensor MappedAvgPoolBackward(at::Tensor input, at::Tensor sample_map,
-                                 int inputHeight, int inputWidth,
-                                 int kernel_size, int interpolation);
+torch::Tensor MappedAvgPoolBackward(torch::Tensor input,
+                                    torch::Tensor sample_map, int inputHeight,
+                                    int inputWidth, int kernel_size,
+                                    int interpolation);
 }  // namespace cpu
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -35,8 +39,9 @@ at::Tensor MappedAvgPoolBackward(at::Tensor input, at::Tensor sample_map,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-at::Tensor MappedAvgPoolforward(at::Tensor input, at::Tensor sample_map,
-                                int kernel_size, int interpolation) {
+torch::Tensor MappedAvgPoolforward(torch::Tensor input,
+                                   torch::Tensor sample_map, int kernel_size,
+                                   int interpolation) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(sample_map);
 
@@ -56,9 +61,10 @@ at::Tensor MappedAvgPoolforward(at::Tensor input, at::Tensor sample_map,
   }
 }
 
-at::Tensor MappedAvgPoolbackward(at::Tensor input, at::Tensor sample_map,
-                                 int inputHeight, int inputWidth,
-                                 int kernel_size, int interpolation) {
+torch::Tensor MappedAvgPoolbackward(torch::Tensor input,
+                                    torch::Tensor sample_map, int inputHeight,
+                                    int inputWidth, int kernel_size,
+                                    int interpolation) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(sample_map);
 

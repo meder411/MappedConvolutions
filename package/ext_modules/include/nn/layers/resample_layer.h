@@ -11,20 +11,22 @@ namespace nn {
 
 #ifndef __NO_CUDA__  // CUDA compilation only
 namespace cuda {
-at::Tensor ResampleToMap(at::Tensor input, at::Tensor sample_map,
-                         int outputHeight, int outputWidth, int interpolation);
+torch::Tensor ResampleToMap(torch::Tensor input, torch::Tensor sample_map,
+                            int outputHeight, int outputWidth,
+                            int interpolation);
 
-at::Tensor ResampleFromMap(at::Tensor grad_output, at::Tensor sample_map,
-                           int interpolation);
+torch::Tensor ResampleFromMap(torch::Tensor grad_output,
+                              torch::Tensor sample_map, int interpolation);
 }  // namespace cuda
 #endif
 
 namespace cpu {
-at::Tensor ResampleToMap(at::Tensor input, at::Tensor sample_map,
-                         int outputHeight, int outputWidth, int interpolation);
+torch::Tensor ResampleToMap(torch::Tensor input, torch::Tensor sample_map,
+                            int outputHeight, int outputWidth,
+                            int interpolation);
 
-at::Tensor ResampleFromMap(at::Tensor grad_output, at::Tensor sample_map,
-                           int interpolation);
+torch::Tensor ResampleFromMap(torch::Tensor grad_output,
+                              torch::Tensor sample_map, int interpolation);
 }  // namespace cpu
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -33,9 +35,9 @@ at::Tensor ResampleFromMap(at::Tensor grad_output, at::Tensor sample_map,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-at::Tensor ResampleToMap(at::Tensor input, at::Tensor sample_map,
-                         int outputHeight, int outputWidth,
-                         int interpolation) {
+torch::Tensor ResampleToMap(torch::Tensor input, torch::Tensor sample_map,
+                            int outputHeight, int outputWidth,
+                            int interpolation) {
   CHECK_CONTIGUOUS(input);
   CHECK_CONTIGUOUS(sample_map);
 
@@ -55,8 +57,8 @@ at::Tensor ResampleToMap(at::Tensor input, at::Tensor sample_map,
   }
 }
 
-at::Tensor ResampleFromMap(at::Tensor grad_output, at::Tensor sample_map,
-                           int interpolation) {
+torch::Tensor ResampleFromMap(torch::Tensor grad_output,
+                              torch::Tensor sample_map, int interpolation) {
   CHECK_CONTIGUOUS(grad_output);
   CHECK_CONTIGUOUS(sample_map);
 
