@@ -88,7 +88,7 @@ Things I intend to do in the next few weeks
 
 - [x] Push package to public GitHub
 - [x] Write some example scripts for resampling to sphere
+- [x] Update backend to PyTorch 1.2 compatibility
 - [ ] Upload network example
 - [ ] Layer docs
-- [ ] Update backend to PyTorch 1.2 compatibility
 - [ ] Clean up some code and improve comments
