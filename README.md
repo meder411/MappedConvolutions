@@ -1,9 +1,10 @@
+## UPDATE 5/25/2020
+New version of backend and more extensive examples to match paper's results coming soon
+
 # Mapped Convolutions
 **Official PyTorch implementation of the mapped convolution operation**
 
 This repository contains the "Mapped Convolutions" library. It is written to be a Python extension to PyTorch and can run on either GPU (needs CUDA) or CPU.
-
-**NOTE 9/25/2019:** Over the next few days/weeks, I will be developing better documentation and try to add examples for each layer as well as a version of the semantic segmentation network from the workshop paper.
 
 
 ## Set Up
